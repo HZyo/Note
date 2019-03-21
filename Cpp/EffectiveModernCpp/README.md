@@ -6,7 +6,8 @@
 
 - [ ] 1 类型推断 Deducing Types
   - [x] Item 1: 理解模板类型推断 Understand template type deduction
-  - [ ] Item 2: 理解 `auto` 类型推断 Understand `auto` type deduction
+  - [x] Item 2: 理解 `auto` 类型推断 Understand `auto` type deduction
+  - [ ] Item 3: 理解 `decltype` Understand `decltype` 
 - [ ] 2 `auto`
 - [ ] 3 迁移到现代 `C++`
 - [ ] 4 智能指针 Smart Pointers
