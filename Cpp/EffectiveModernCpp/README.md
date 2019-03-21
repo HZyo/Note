@@ -1,13 +1,14 @@
 # Effective Modern C++
 
-![img](https://img3.doubanio.com/view/subject/l/public/s27951196.jpg)
+![img](https://raw.githubusercontent.com/Ubpa/ImgBed/master/Note/Cpp/EffectiveModernCpp/s27951196.jpg)
 
 ## TODO
 
-- [ ] 1 类型推断 Deducing Types
+- [ ] [1 类型推断 Deducing Types](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C1.md) 
   - [x] Item 1: 理解模板类型推断 Understand template type deduction
   - [x] Item 2: 理解 `auto` 类型推断 Understand `auto` type deduction
-  - [ ] Item 3: 理解 `decltype` Understand `decltype` 
+  - [x] Item 3: 理解 `decltype` Understand `decltype` 
+  - [ ] Item 4: 知道如何查看推断出的类型 Know how to view deduced types. 
 - [ ] 2 `auto`
 - [ ] 3 迁移到现代 `C++`
 - [ ] 4 智能指针 Smart Pointers
