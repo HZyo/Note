@@ -8,9 +8,11 @@
   - [x] Item 1: 理解模板类型推断 Understand template type deduction
   - [x] Item 2: 理解 `auto` 类型推断 Understand `auto` type deduction
   - [x] Item 3: 理解 `decltype` Understand `decltype` 
-  - [ ] Item 4: 知道如何查看推断出的类型 Know how to view deduced types. 
-- [ ] 2 `auto`
-- [ ] 3 迁移到现代 `C++`
+  - [x] Item 4: 知道如何查看推断出的类型 Know how to view deduced types
+- [ ] 2 `auto` 
+  - [ ] Item 5: `auto` 好于显式声明 Prefer `auto` to explicit type declarations 
+  - [ ] Item 6: 显示初始化器 Use the explicitly typed initializer idiom when `auto` deduces undesired types. 
+- [ ] 3 迁移到现代 `C++` 
 - [ ] 4 智能指针 Smart Pointers
 - [ ] 5 右值引用、移动语义和完美转发 Rvalue References, Move Semantics, and Perfect Forwarding
 - [ ] 6 `Lambda` 表达式 Lambda Expresions
