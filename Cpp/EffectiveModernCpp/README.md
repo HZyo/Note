@@ -14,7 +14,8 @@
   - [x] Item 6: 显式类型初始化器习语 Use the explicitly typed initializer idiom when `auto` deduces undesired types. 
 - [ ] 3 [迁移到现代 C++](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C3.md) 
   - [x] Item 7: 创建对象时区分 `()` 和 `{}` Distinguish between `()` and `{}` when creating objects 
-  - [ ] Item 8: `nullptr` 好于 `0` 和 `NULL` 
+  - [x] Item 8: `nullptr` 好于 `0` 和 `NULL` 
+  - [ ] Item 9: 别名声明好于 `typedef` Prefer alias declarations to `typedef` 
 - [ ] 4 智能指针 Smart Pointers
 - [ ] 5 右值引用、移动语义和完美转发 Rvalue References, Move Semantics, and Perfect Forwarding
 - [ ] 6 `Lambda` 表达式 Lambda Expresions
