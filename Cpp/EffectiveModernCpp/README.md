@@ -15,7 +15,8 @@
 - [ ] 3 [迁移到现代 C++](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C3.md) 
   - [x] Item 7: 创建对象时区分 `()` 和 `{}` Distinguish between `()` and `{}` when creating objects 
   - [x] Item 8: `nullptr` 好于 `0` 和 `NULL` 
-  - [ ] Item 9: 别名声明好于 `typedef` Prefer alias declarations to `typedef` 
+  - [x] Item 9: 别名声明好于 `typedef` Prefer alias declarations to `typedef` 
+  - [ ] Item 10: 作用域 `enum` 好于无作用域 `enum`  Prefer scoped `enum` to unscoped `enum` 
 - [ ] 4 智能指针 Smart Pointers
 - [ ] 5 右值引用、移动语义和完美转发 Rvalue References, Move Semantics, and Perfect Forwarding
 - [ ] 6 `Lambda` 表达式 Lambda Expresions
