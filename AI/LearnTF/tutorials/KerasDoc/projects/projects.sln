@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01", "01", "{554028DF-7715-42BB-899B-77757DF41869}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_01_Sequential", "01_01_Sequential", "{FE70E0BB-4AD8-4121-8F60-E3721981BA1F}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "01_01_01_MLP_softmax", "01_01_01_MLP_softmax\01_01_01_MLP_softmax.pyproj", "{8A036BBB-CA52-4421-BAA1-3947F5DCD15A}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "01_01_02_MLP_sigmoid", "01_01_02_MLP_sigmoid\01_01_02_MLP_sigmoid.pyproj", "{D8DF334D-68AA-4928-B145-FCA71C44C574}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "01_01_03_CNN_VGG", "01_01_03_CNN_VGG\01_01_03_CNN_VGG.pyproj", "{C496E52E-45BE-4D4B-AF1B-80E4F7CD1EC1}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "01_01_04_LSTM", "01_01_04_LSTM\01_01_04_LSTM.pyproj", "{47FF0824-3C82-4BC3-8E18-CAA7103C648F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A036BBB-CA52-4421-BAA1-3947F5DCD15A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A036BBB-CA52-4421-BAA1-3947F5DCD15A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8DF334D-68AA-4928-B145-FCA71C44C574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8DF334D-68AA-4928-B145-FCA71C44C574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C496E52E-45BE-4D4B-AF1B-80E4F7CD1EC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C496E52E-45BE-4D4B-AF1B-80E4F7CD1EC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47FF0824-3C82-4BC3-8E18-CAA7103C648F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47FF0824-3C82-4BC3-8E18-CAA7103C648F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE70E0BB-4AD8-4121-8F60-E3721981BA1F} = {554028DF-7715-42BB-899B-77757DF41869}
+		{8A036BBB-CA52-4421-BAA1-3947F5DCD15A} = {FE70E0BB-4AD8-4121-8F60-E3721981BA1F}
+		{D8DF334D-68AA-4928-B145-FCA71C44C574} = {FE70E0BB-4AD8-4121-8F60-E3721981BA1F}
+		{C496E52E-45BE-4D4B-AF1B-80E4F7CD1EC1} = {FE70E0BB-4AD8-4121-8F60-E3721981BA1F}
+		{47FF0824-3C82-4BC3-8E18-CAA7103C648F} = {FE70E0BB-4AD8-4121-8F60-E3721981BA1F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E436A369-6EEC-4DD0-8579-551B8FABA7D7}
+	EndGlobalSection
+EndGlobal
