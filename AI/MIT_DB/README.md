@@ -12,7 +12,7 @@
 >
 > 页数: 800
 
-![cover](https://raw.githubusercontent.com/Ubpa/ImgBed/master/Note/AI/MIT_DB/000.jpg?token=AOZ4TxCNmcgQmLLyxCGwuoDEFeTzjMuVks5cmaQEwA%3D%3D)
+![cover](https://raw.githubusercontent.com/Ubpa/ImgBed/master/Note/AI/MIT_DB/000.jpg)
 
 ## 项目简介
 
