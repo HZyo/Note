@@ -11,7 +11,7 @@
   - [x] 1.2 真实感绘制和光线追踪 Photorealistic Rendering and the Ray-Tracing Algorithm
   - [x] 1.3 pbrt: 系统综述 pbrt: System Overview
   - [x] 1.4 pbrt 并行 Parallelization of pbrt
-  - [ ] 1.5 如何读书 How to Proceed Through this Book
+  - [x] 1.5 如何读书 How to Proceed Through this Book
   - [ ] 1.6 源码 Using and Understanding the code
   - [ ] 1.7 PBR简史 A Brief History of Physically Based Rendering
 - [ ] C02 几何变换 Geometry and Transformations
