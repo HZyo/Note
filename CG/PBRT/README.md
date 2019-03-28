@@ -9,8 +9,8 @@
 - [ ] [C01 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C1.md) 
   - [x] 1.1 文学编程 Literate Programming
   - [x] 1.2 真实感绘制和光线追踪 Photorealistic Rendering and the Ray-Tracing Algorithm
-  - [ ] 1.3 pbrt: 系统综述 pbrt: System Overview
-  - [ ] 1.4 pbrt 并行 Parallelization of pbrt
+  - [x] 1.3 pbrt: 系统综述 pbrt: System Overview
+  - [x] 1.4 pbrt 并行 Parallelization of pbrt
   - [ ] 1.5 如何读书 How to Proceed Through this Book
   - [ ] 1.6 源码 Using and Understanding the code
   - [ ] 1.7 PBR简史 A Brief History of Physically Based Rendering
