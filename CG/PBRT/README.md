@@ -31,7 +31,7 @@
   - [ ] 3.3 柱面 Cylinders
   - [ ] 3.4 圆盘 Disks
   - [ ] 3.5 其他二次曲面 Other Quadrics
-  - [ ] 3.6 三角网格 Triangle Meshes
+  - [x] 3.6 三角网格 Triangle Meshes
   - [ ] *3.7 曲线 Curves
   - [ ] *3.8 细分曲面 Subdivision Surfaces
   - [ ] *3.9 舍入误差 Managing Rounding Error
