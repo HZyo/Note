@@ -23,9 +23,18 @@
   - [x] 2.6 包围盒 Bounding Boxes
   - [x] 2.7 变换 Transformations
   - [x] 2.8 使用变换 Applying Transformations
-  - [ ] 2.9 动画变化 Animating Transformations
+  - [ ] *2.9 动画变化 Animating Transformations
   - [ ] 2.10 交互 Interactions
-- [ ] C03 形状 Shapes
+- [ ] [C03 形状 Shapes](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C3.md)
+  - [x] 3.1 接口 Basic Shape Interface
+  - [x] 3.2 球 Spheres
+  - [ ] 3.3 柱面 Cylinders
+  - [ ] 3.4 圆盘 Disks
+  - [ ] 3.5 其他二次曲面 Other Quadrics
+  - [ ] 3.6 三角网格 Triangle Meshes
+  - [ ] *3.7 曲线 Curves
+  - [ ] *3.8 细分曲面 Subdivision Surfaces
+  - [ ] *3.9 舍入误差 Managing Rounding Error
 - [ ] C04 图元和相交加速 Primitives and Intersection Acceleration
 - [ ] C05 颜色和辐射度学 Color and Radiometry
 - [ ] C06 相机 Camera Models
