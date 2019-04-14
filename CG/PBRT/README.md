@@ -35,7 +35,16 @@
   - [ ] *3.7 曲线 Curves
   - [ ] *3.8 细分曲面 Subdivision Surfaces
   - [ ] *3.9 舍入误差 Managing Rounding Error
-- [ ] C04 图元和相交加速 Primitives and Intersection Acceleration
+- [ ] [C04 图元和相交加速 Primitives and Intersection Acceleration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C4.md)
+  - [ ] 4.1 图元接口和几何图元 Primitive Interface and Geometric primitives
+  - [x] 4.2 聚合物 Aggregates
+  - [ ] 4.3 层次包围盒 Bounding Volume Hierarchies
+    - [ ] 4.3.1 BVH 构建 BVH Construction
+    - [x] 4.3.2 SAH
+    - [ ] 4.3.3 HLBVH
+    - [x] 4.3.4 Compact BVH for Traversal
+    - [x] 4.3.5 遍历 Traversal
+  - [ ] 4.4 KD-Tree 加速器 KD-Tree Accelerator
 - [ ] C05 颜色和辐射度学 Color and Radiometry
 - [ ] C06 相机 Camera Models
 - [ ] C07 采样和重建 Sampling and Reconstruction
