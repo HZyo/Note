@@ -48,9 +48,9 @@
 - [ ] [C05 颜色和辐射度学 Color and Radiometry](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C5.md) 
   - [x] 5.1 谱表示 Spectral Representation
   - [ ] 5.2 `SampledSpectrum` 
-  - [ ] 5.3 `RGBSpectrum` 
+  - [x] 5.3 `RGBSpectrum` 
   - [x] 5.4 辐射度量学 Radiometry
-  - [ ] 5.5 辐射积分 Radiometric Integrals
+  - [x] 5.5 辐射积分 Radiometric Integrals
   - [ ] 5.6 表面反射 Surface Reflection
 - [ ] C06 相机 Camera Models
 - [ ] C07 采样和重建 Sampling and Reconstruction
