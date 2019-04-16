@@ -52,7 +52,11 @@
   - [x] 5.4 辐射度量学 Radiometry
   - [x] 5.5 辐射积分 Radiometric Integrals
   - [x] 5.6 表面反射 Surface Reflection
-- [ ] C06 相机 Camera Models
+- [ ] [C06 相机模型 Camera Models](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C6.md) 
+  - [x] 6.1 相机模型 Camera Model
+  - [x] 6.2 投影相机模型 Projective Camera Models
+  - [ ] 6.3 环境相机 Environment Camera
+  - [ ] *6.4 真实相机 Realistic Cameras
 - [ ] C07 采样和重建 Sampling and Reconstruction
 - [ ] C08 反射 Reflection Models
 - [ ] C09 材质 Materials
