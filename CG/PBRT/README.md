@@ -6,7 +6,7 @@
 
 ## TODO
 
-- [x] [C01 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C1.md) 
+- [x] [C01 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C01.md) 
   - [x] 1.1 文学编程 Literate Programming
   - [x] 1.2 真实感绘制和光线追踪 Photorealistic Rendering and the Ray-Tracing Algorithm
   - [x] 1.3 pbrt: 系统综述 pbrt: System Overview
@@ -14,7 +14,7 @@
   - [x] 1.5 如何读书 How to Proceed Through this Book
   - [x] 1.6 源码 Using and Understanding the code
   - [x] 1.7 PBR简史 A Brief History of Physically Based Rendering
-- [ ] [C02 几何变换 Geometry and Transformations](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C2.md) 
+- [ ] [C02 几何与变换 Geometry and Transformations](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C02.md) 
   - [x] 2.1 坐标系 Coordinate Systems
   - [x] 2.2 向量 Vectors
   - [x] 2.3 点 Points
@@ -25,7 +25,7 @@
   - [x] 2.8 使用变换 Applying Transformations
   - [ ] *2.9 动画变化 Animating Transformations
   - [ ] 2.10 交互 Interactions
-- [ ] [C03 形状 Shapes](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C3.md) 
+- [ ] [C03 形状 Shapes](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C03.md) 
   - [x] 3.1 接口 Basic Shape Interface
   - [x] 3.2 球 Spheres
   - [ ] 3.3 柱面 Cylinders
@@ -35,7 +35,7 @@
   - [ ] *3.7 曲线 Curves
   - [ ] *3.8 细分曲面 Subdivision Surfaces
   - [ ] *3.9 舍入误差 Managing Rounding Error
-- [ ] [C04 图元和相交加速 Primitives and Intersection Acceleration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C4.md) 
+- [ ] [C04 图元和相交加速 Primitives and Intersection Acceleration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C04.md) 
   - [ ] 4.1 图元接口和几何图元 Primitive Interface and Geometric primitives
   - [x] 4.2 聚合物 Aggregates
   - [ ] 4.3 层次包围盒 Bounding Volume Hierarchies
@@ -45,17 +45,17 @@
     - [x] 4.3.4 Compact BVH for Traversal
     - [x] 4.3.5 遍历 Traversal
   - [ ] 4.4 KD-Tree 加速器 KD-Tree Accelerator
-- [ ] [C05 颜色和辐射度学 Color and Radiometry](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C5.md) 
+- [ ] [C05 颜色和辐射度学 Color and Radiometry](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C05.md) 
   - [x] 5.1 谱表示 Spectral Representation
   - [ ] 5.2 `SampledSpectrum` 
   - [x] 5.3 `RGBSpectrum` 
   - [x] 5.4 辐射度量学 Radiometry
   - [x] 5.5 辐射积分 Radiometric Integrals
   - [x] 5.6 表面反射 Surface Reflection
-- [ ] [C06 相机模型 Camera Models](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C6.md) 
+- [ ] [C06 相机模型 Camera Models](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C06.md) 
   - [x] 6.1 相机模型 Camera Model
   - [x] 6.2 投影相机模型 Projective Camera Models
-  - [ ] 6.3 环境相机 Environment Camera
+  - [x] 6.3 环境相机 Environment Camera
   - [ ] *6.4 真实相机 Realistic Cameras
 - [ ] C07 采样和重建 Sampling and Reconstruction
 - [ ] C08 反射 Reflection Models
