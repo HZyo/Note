@@ -51,7 +51,7 @@
   - [x] 5.3 `RGBSpectrum` 
   - [x] 5.4 辐射度量学 Radiometry
   - [x] 5.5 辐射积分 Radiometric Integrals
-  - [ ] 5.6 表面反射 Surface Reflection
+  - [x] 5.6 表面反射 Surface Reflection
 - [ ] C06 相机 Camera Models
 - [ ] C07 采样和重建 Sampling and Reconstruction
 - [ ] C08 反射 Reflection Models
