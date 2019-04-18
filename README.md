@@ -8,6 +8,8 @@
   - [PBRT](https://github.com/Ubpa/Note/tree/master/CG/PBRT) 
 - [Cpp](https://github.com/Ubpa/Note/tree/master/Cpp) 
   - [Effective Modern C++](https://github.com/Ubpa/Note/tree/master/Cpp/EffectiveModernCpp) 
+- [Math](https://github.com/Ubpa/Note/blob/master/Math) 
+  - [Intro2Calculus_ustc](https://github.com/Ubpa/Note/blob/master/Math/Intro2Calculus_ustc) 
 
 ## 额外资源
 
