@@ -4,7 +4,7 @@
 
 ## TODO
 
-- [ ] [C01 信号与系统](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C01.md) 
+- [x] [C01 信号与系统](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C01.md) 
 - [ ] C02 线性时不变系统
 - [ ] C03 周期信号的傅里叶级数表示
 - [ ] C04 连续时间傅里叶变换
