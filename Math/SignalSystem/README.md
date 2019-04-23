@@ -10,7 +10,7 @@
 - [x] [C04 连续时间傅里叶变换](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C04.md) 
 - [ ] [C05 离散时间傅里叶变换](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C05.md) 
 - [ ] C06 信号与系统的时域和频域特性
-- [ ] [C07 采样](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C07.md) 
+- [x] [C07 采样](https://github.com/Ubpa/Note/blob/master/Math/SignalSystem/notes/C07.md) 
 - [ ] C08 通信系统
 - [ ] C09 拉普拉斯变换
 - [ ] C10 Z 变换
