@@ -58,7 +58,7 @@
   - [x] 6.3 环境相机 Environment Camera
   - [ ] *6.4 真实相机 Realistic Cameras
 - [ ] [C07 采样和重建 Sampling and Reconstruction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C07.md) 
-  - [ ] 7.1 采样理论 Sampling Theory
+  - [x] 7.1 采样理论 Sampling Theory
   - [ ] 7.2 采样接口 Samping Interface
   - [ ] 7.3 分层抽样 Stratified Sampling
   - [ ] *7.4 Halton 采样器 Halton Sampler
