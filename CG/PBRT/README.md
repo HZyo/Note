@@ -59,7 +59,7 @@
   - [ ] *6.4 真实相机 Realistic Cameras
 - [ ] [C07 采样和重建 Sampling and Reconstruction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C07.md) 
   - [x] 7.1 采样理论 Sampling Theory
-  - [ ] 7.2 采样接口 Samping Interface
+  - [x] 7.2 采样接口 Samping Interface
   - [ ] 7.3 分层抽样 Stratified Sampling
   - [ ] *7.4 Halton 采样器 Halton Sampler
   - [ ] *7.5 (0, 2)-序列采样器 (0, 2)-Sequence Sampler
