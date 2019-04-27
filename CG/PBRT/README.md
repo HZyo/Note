@@ -60,13 +60,13 @@
 - [ ] [C07 采样和重建 Sampling and Reconstruction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C07.md) 
   - [x] 7.1 采样理论 Sampling Theory
   - [x] 7.2 采样接口 Samping Interface
-  - [ ] 7.3 分层抽样 Stratified Sampling
+  - [x] 7.3 分层抽样 Stratified Sampling
   - [ ] *7.4 Halton 采样器 Halton Sampler
   - [ ] *7.5 (0, 2)-序列采样器 (0, 2)-Sequence Sampler
   - [ ] *7.6 最大化最小距离采样器 Maximized Minimal Distance Sampler
   - [ ] *7.7 Sobol’ 采样器 Sobol’ Sampler
-  - [ ] 7.8 图像重建 Image Reconstruction
-  - [ ] 7.9 胶片和成像管道 Film and the Imaging Pipeline
+  - [x] 7.8 图像重建 Image Reconstruction
+  - [x] 7.9 胶片和成像管道 Film and the Imaging Pipeline
 - [ ] C08 反射 Reflection Models
 - [ ] C09 材质 Materials
 - [ ] C10 纹理 Texture
