@@ -68,6 +68,12 @@
   - [x] 7.8 图像重建 Image Reconstruction
   - [x] 7.9 胶片和成像管道 Film and the Imaging Pipeline
 - [ ] C08 反射 Reflection Models
+  - [ ] 8.1 基础接口 Basic Interface
+  - [ ] 8.2 镜面反射和透射 Specular Reflection and Transmission
+  - [ ] 8.3 朗伯反射 Lambertian Reflection
+  - [ ] 8.4 微表面模型 Microfacet Models
+  - [ ] 8.5 菲涅尔入射效应 Fresnel Incidence Effects
+  - [ ] 8.6 傅里叶基 BSDFs Fourier Basis BSDFs
 - [ ] C09 材质 Materials
 - [ ] C10 纹理 Texture
 - [ ] C11 体积散射 Volume Scattering
