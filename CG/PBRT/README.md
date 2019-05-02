@@ -70,7 +70,7 @@
 - [ ] C08 反射 Reflection Models
   - [x] 8.1 基础接口 Basic Interface
   - [x] 8.2 镜面反射和透射 Specular Reflection and Transmission
-  - [ ] 8.3 朗伯反射 Lambertian Reflection
+  - [x] 8.3 朗伯反射 Lambertian Reflection
   - [ ] 8.4 微表面模型 Microfacet Models
   - [ ] 8.5 菲涅尔入射效应 Fresnel Incidence Effects
   - [ ] 8.6 傅里叶基 BSDFs Fourier Basis BSDFs
