@@ -71,8 +71,8 @@
   - [x] 8.1 基础接口 Basic Interface
   - [x] 8.2 镜面反射和透射 Specular Reflection and Transmission
   - [x] 8.3 朗伯反射 Lambertian Reflection
-  - [ ] 8.4 微表面模型 Microfacet Models
-  - [ ] 8.5 菲涅尔入射效应 Fresnel Incidence Effects
+  - [x] 8.4 微表面模型 Microfacet Models
+  - [x] 8.5 菲涅尔入射效应 Fresnel Incidence Effects
   - [ ] 8.6 傅里叶基 BSDFs Fourier Basis BSDFs
 - [ ] C09 材质 Materials
 - [ ] C10 纹理 Texture
