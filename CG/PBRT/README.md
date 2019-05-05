@@ -67,7 +67,7 @@
   - [ ] *7.7 Sobol’ 采样器 Sobol’ Sampler
   - [x] 7.8 图像重建 Image Reconstruction
   - [x] 7.9 胶片和成像管道 Film and the Imaging Pipeline
-- [ ] C08 反射 Reflection Models
+- [ ] [C08 反射 Reflection Models](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C08.md) 
   - [x] 8.1 基础接口 Basic Interface
   - [x] 8.2 镜面反射和透射 Specular Reflection and Transmission
   - [x] 8.3 朗伯反射 Lambertian Reflection
@@ -77,7 +77,13 @@
 - [ ] C09 材质 Materials
 - [ ] C10 纹理 Texture
 - [ ] C11 体积散射 Volume Scattering
-- [ ] C12 光源 Light Sources
+- [ ] [C12 光源 Light Sources](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C12.md) 
+  - [x] 12.1 发光 Light Emission
+  - [x] 12.2 光接口 Light Interface
+  - [ ] 12.3 点光源 Point Light
+  - [ ] 12.4 远光 Distant Lights
+  - [ ] 12.5 面光源 Area Lights
+  - [ ] 12.6 无限区域面光源
 - [ ] C13 蒙特卡洛积分 Monte Carlo Integration
 - [ ] C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
