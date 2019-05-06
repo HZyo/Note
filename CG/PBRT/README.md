@@ -81,9 +81,9 @@
   - [x] 12.1 发光 Light Emission
   - [x] 12.2 光接口 Light Interface
   - [ ] 12.3 点光源 Point Light
-  - [ ] 12.4 远光 Distant Lights
-  - [ ] 12.5 面光源 Area Lights
-  - [ ] 12.6 无限区域面光源
+  - [x] 12.4 远光 Distant Lights
+  - [x] 12.5 面光源 Area Lights
+  - [x] 12.6 无限区域面光源
 - [ ] C13 蒙特卡洛积分 Monte Carlo Integration
 - [ ] C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
