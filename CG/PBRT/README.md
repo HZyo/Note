@@ -81,6 +81,9 @@
   - [x] 12.1 发光 Light Emission
   - [x] 12.2 光接口 Light Interface
   - [ ] 12.3 点光源 Point Light
+    - [x] 12.3.1 聚光灯 SpotLights
+    - [ ] 12.3.2 纹理投影光源 Texture Projection Lights
+    - [ ] 12.3.3 变角光度图光源 Goniophotometruc Diagram Lights
   - [x] 12.4 远光 Distant Lights
   - [x] 12.5 面光源 Area Lights
   - [x] 12.6 无限区域面光源
@@ -91,6 +94,13 @@
   - [ ] *13.4 大都市采样 Metropolis Sampling
   - [x] 13.5 分布变换 Transforming between Distributions
   - [ ] 13.6 多维变换的二维采样 2D Sampling with Multidimensional Transformations
+    - [x] 13.6.1 半球均匀采样 Uniformly Sampling a Hemisphere
+    - [x] 13.6.2 单位圆盘上采样 Samping a Unit Disk
+    - [x] 13.6.3 余弦加权半球采样 Cosine-Weighted Hemisphere Sampling
+    - [ ] 13.6.4 圆锥采样 Sampling a Cone
+    - [ ] 13.6.5 三角形采样 Sampling a Triangle
+    - [ ] *13.6.6 相机采样 Sampling Cameras
+    - [x] 13.6.7 分段常数 2D 分布 Piecewise-Constant 2D Distributions
   - [ ] 13.7 俄罗斯轮盘赌和分裂 Rissian Roulette and Spitting
   - [ ] 13.8 仔细的样本布置 Careful Sample Placement
   - [ ] 13.9 偏差 Bias
