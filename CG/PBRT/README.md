@@ -86,10 +86,10 @@
   - [x] 12.6 无限区域面光源
 - [ ] [C13 蒙特卡洛积分 Monte Carlo Integration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C13.md) 
   - [x] 13.1 背景与概率回顾 Background and Probability Review
-  - [ ] 13.2 蒙特卡洛估计 the Monte Carlo Estimator
-  - [ ] 13.3 采样随机变量 Samping Random Variables
+  - [x] 13.2 蒙特卡洛估计 the Monte Carlo Estimator
+  - [x] 13.3 采样随机变量 Samping Random Variables
   - [ ] *13.4 大都市采样 Metropolis Sampling
-  - [ ] 13.5 分布变换 Transforming between Distributions
+  - [x] 13.5 分布变换 Transforming between Distributions
   - [ ] 13.6 多维变换的二维采样 2D Sampling with Multidimensional Transformations
   - [ ] 13.7 俄罗斯轮盘赌和分裂 Rissian Roulette and Spitting
   - [ ] 13.8 仔细的样本布置 Careful Sample Placement
