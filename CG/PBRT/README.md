@@ -105,7 +105,18 @@
   - [x] 13.8 仔细的样本布置 Careful Sample Placement
   - [x] 13.9 偏差 Bias
   - [x] 13.10 重要性采样 Importance Samping
-- [ ] C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection
+- [ ] [C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C14.md) 
+  - [ ] 14.1 采样反射函数 Sampling Reflection Functions
+    - [x] 14.1.1 微面元 BxDFs Microfacet BxDFs
+    - [x] 14.1.2 FresnelBlend
+    - [x] 14.1.3 镜面反射和透射 Specular Reflection and Transmission
+    - [ ] 14.1.4 傅里叶 BSDF Fourier BSDF
+    - [ ] 14.1.5 应用：计算反射 Application: Estimationg Reflectance
+    - [ ] 14.1.6 采样 BSDFs Sampling BSDFs
+  - [ ] 14.2 采样光源 Sampling Light Sources
+  - [ ] 14.3 直接光照 Direct Lighting
+  - [ ] 14.4 光传输方程 the Light Transport Equation
+  - [ ] 14.5 路径追踪 Path Tracing
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
 - [ ] C16 光传输 3: 双向方法 Light Transport 3: Bidirectional Methods
 - [ ] C17 回顾和未来 Retrospective and the Future
