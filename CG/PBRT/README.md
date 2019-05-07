@@ -101,10 +101,10 @@
     - [ ] 13.6.5 三角形采样 Sampling a Triangle
     - [ ] *13.6.6 相机采样 Sampling Cameras
     - [x] 13.6.7 分段常数 2D 分布 Piecewise-Constant 2D Distributions
-  - [ ] 13.7 俄罗斯轮盘赌和分裂 Rissian Roulette and Spitting
-  - [ ] 13.8 仔细的样本布置 Careful Sample Placement
-  - [ ] 13.9 偏差 Bias
-  - [ ] 13.10 重要性采样 Importance Samping
+  - [x] 13.7 俄罗斯轮盘赌和分裂 Rissian Roulette and Spitting
+  - [x] 13.8 仔细的样本布置 Careful Sample Placement
+  - [x] 13.9 偏差 Bias
+  - [x] 13.10 重要性采样 Importance Samping
 - [ ] C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
 - [ ] C16 光传输 3: 双向方法 Light Transport 3: Bidirectional Methods
