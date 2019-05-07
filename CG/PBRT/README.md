@@ -114,8 +114,12 @@
     - [ ] 14.1.5 应用：计算反射 Application: Estimationg Reflectance
     - [ ] 14.1.6 采样 BSDFs Sampling BSDFs
   - [ ] 14.2 采样光源 Sampling Light Sources
-  - [ ] 14.3 直接光照 Direct Lighting
-  - [ ] 14.4 光传输方程 the Light Transport Equation
+    - [x] 14.2.1 奇异性光源 Lights with Singularities
+    - [ ] 14.2.2 形状采样 Sampling Shapes
+    - [x] 14.2.3 区域光源 Area Lights
+    - [ ] 14.2.4 无限区域光源 Infinite Area Lights
+  - [x] 14.3 直接光照 Direct Lighting
+  - [x] 14.4 光传输方程 the Light Transport Equation
   - [ ] 14.5 路径追踪 Path Tracing
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
 - [ ] C16 光传输 3: 双向方法 Light Transport 3: Bidirectional Methods
