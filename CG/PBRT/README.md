@@ -120,7 +120,7 @@
     - [ ] 14.2.4 无限区域光源 Infinite Area Lights
   - [x] 14.3 直接光照 Direct Lighting
   - [x] 14.4 光传输方程 the Light Transport Equation
-  - [ ] 14.5 路径追踪 Path Tracing
+  - [x] 14.5 路径追踪 Path Tracing
 - [ ] C15 光传输 2: 体积渲染 Light Transport 2: Volume Rendering
 - [ ] C16 光传输 3: 双向方法 Light Transport 3: Bidirectional Methods
 - [ ] C17 回顾和未来 Retrospective and the Future
