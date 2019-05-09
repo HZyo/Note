@@ -1,2 +1,5 @@
 *.aux
 *.log
+*.idx
+*.tex
+*.toc
