@@ -5,6 +5,7 @@
 - [AI](https://github.com/Ubpa/Note/tree/master/AI) 
   - [MIT_DB](https://github.com/Ubpa/Note/tree/master/AI/MIT_DB) 
 - [CG](https://github.com/Ubpa/Note/tree/master/CG) 
+  - [papers](https://github.com/Ubpa/Note/tree/master/CG/papers) 
   - [PBRT](https://github.com/Ubpa/Note/tree/master/CG/PBRT) 
 - [Cpp](https://github.com/Ubpa/Note/tree/master/Cpp) 
   - [Effective Modern C++](https://github.com/Ubpa/Note/tree/master/Cpp/EffectiveModernCpp) 
