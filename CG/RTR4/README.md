@@ -1,17 +1,16 @@
-# Real Time Rendering 4th
+Real Time Rendering 4th
 
 ![bookcover](https://raw.githubusercontent.com/Ubpa/ImgBed/master/Note/CG/RTR4/bookcover.jpg)
 
 ## TODO
 
 - [x] [C01. 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C01.md) 
-- [ ] [C02. 渲染管线 The Graphics Rendering Pipeline](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C02.md)
+- [x] [C02. 渲染管线 The Graphics Rendering Pipeline](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C02.md) 
   - [x] 2.1 架构 Architecture
   - [x] 2.2 应用层 The Application Stage
   - [x] 2.3 几何处理 Geometry Processing
-  - [ ] 2.4 光栅化 Rasterization
-  - [ ] 2.5 像素处理 Pixel Processing
-  - [ ] 2.6 贯通管道 Trough Pipeline
+  - [x] 2.4 光栅化 Rasterization
+  - [x] 2.5 像素处理 Pixel Processing
 - [ ] C03. GPU The Graphics Processing Unit
 - [ ] C04. 变换 Transforms
 - [ ] C05. 着色基础 Shading Basics
@@ -34,4 +33,3 @@
 - [ ] C22. 相交测试方法 Intersection Test Methods
 - [ ] C23. 图像硬件 Graphics Hardware
 - [ ] C24. 未来 The Future
-
