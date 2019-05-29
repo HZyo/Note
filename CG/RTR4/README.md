@@ -1,10 +1,10 @@
-# CReal Time Rendering 4th
+# Real Time Rendering 4th
 
 ![bookcover](https://raw.githubusercontent.com/Ubpa/ImgBed/master/Note/CG/RTR4/bookcover.jpg)
 
 ## TODO
 
-- [ ] C01 导论 Introduction
+- [x] [C01 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C01.md) 
 - [ ] C02 渲染管线 The Graphics Rendering Pipeline
 - [ ] C03 GPU The Graphics Processing Unit
 - [ ] C04 变换 Transforms
