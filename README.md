@@ -7,6 +7,7 @@
 - [CG](https://github.com/Ubpa/Note/tree/master/CG) 
   - [papers](https://github.com/Ubpa/Note/tree/master/CG/papers) 
   - [PBRT](https://github.com/Ubpa/Note/tree/master/CG/PBRT) 
+  - [RTR4](https://github.com/Ubpa/Note/tree/master/CG/RTR4) 
 - [Cpp](https://github.com/Ubpa/Note/tree/master/Cpp) 
   - [Effective Modern C++](https://github.com/Ubpa/Note/tree/master/Cpp/EffectiveModernCpp) 
 - [Math](https://github.com/Ubpa/Note/blob/master/Math) 
@@ -20,5 +21,3 @@
 链接：https://pan.baidu.com/s/1R9EmOkmatHpRjGIAQMBS1Q 
 
 提取码：tclq
-
-
