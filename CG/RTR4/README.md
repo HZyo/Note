@@ -13,8 +13,8 @@
   - [x] 2.5 像素处理 Pixel Processing
 - [ ] C03. GPU The Graphics Processing Unit
   - [x] 3.1 数据并行架构 Data-Parallel Architectures
-  - [ ] 3.2 GPU 管线概览 GPU Pipeline Overview
-  - [ ] 3.3 可编程着色器阶段 The Programmable Shader Stage
+  - [x] 3.2 GPU 管线概览 GPU Pipeline Overview
+  - [x] 3.3 可编程着色器阶段 The Programmable Shader Stage
   - [ ] 3.4 可编程着色和 API 的发展 The Evolution of Programmable Shading and APIs
   - [ ] 3.5 顶点着色器 The Vertex Shader
   - [ ] 3.6 曲面细分阶段 The Tessellation Stage
