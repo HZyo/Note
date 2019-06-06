@@ -15,7 +15,13 @@
   - [ ] 4.5 变形 Morphing
   - [ ] 4.6 Geometry Cache Playback
   - [ ] 4.7 投影 Projections
-- [ ] C05. 着色基础 Shading Basics
+- [ ] [C05. 着色基础 Shading Basics](notes/C05.md) 
+  - [x] 5.1 着色模型 Shading Models
+  - [x] 5.2 光源 Light Sources
+  - [ ] 5.3 实现着色模型 Implementing Shading Models
+  - [ ] 5.4 锯齿与抗锯齿 Aliasing and Antialiasing
+  - [ ] 5.5 Transparency. Alpha and Compositing
+  - [ ] 5.6 显示编码 Display Encoding
 - [ ] C06. 纹理 Texturing
 - [ ] C07. 阴影 Shadows
 - [ ] C08. 光和颜色 Light and Color
