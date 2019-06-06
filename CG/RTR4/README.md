@@ -4,24 +4,9 @@
 
 ## TODO
 
-- [x] [C01. 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C01.md) 
-- [x] [C02. 渲染管线 The Graphics Rendering Pipeline](https://github.com/Ubpa/Note/blob/master/CG/RTR4/notes/C02.md) 
-  - [x] 2.1 架构 Architecture
-  - [x] 2.2 应用层 The Application Stage
-  - [x] 2.3 几何处理 Geometry Processing
-  - [x] 2.4 光栅化 Rasterization
-  - [x] 2.5 像素处理 Pixel Processing
-- [ ] C03. GPU The Graphics Processing Unit
-  - [x] 3.1 数据并行架构 Data-Parallel Architectures
-  - [x] 3.2 GPU 管线概览 GPU Pipeline Overview
-  - [x] 3.3 可编程着色器阶段 The Programmable Shader Stage
-  - [x] 3.4 可编程着色和 API 的发展 The Evolution of Programmable Shading and APIs
-  - [ ] 3.5 顶点着色器 The Vertex Shader
-  - [ ] 3.6 曲面细分阶段 The Tessellation Stage
-  - [ ] 3.7 几何着色器 The Geometry Shader
-  - [ ] 3.8 像素着色器 The Pixel Shader
-  - [ ] 3.9 合并阶段 The Merging Stage
-  - [ ] 3.10 计算着色器 The Compute Shader
+- [x] [C01. 导论 Introduction](notes/C01.md) 
+- [x] [C02. 渲染管线 The Graphics Rendering Pipeline](notes/C02.md) 
+- [ ] [C03. GPU The Graphics Processing Unit](notes/C03.md) 
 - [ ] C04. 变换 Transforms
 - [ ] C05. 着色基础 Shading Basics
 - [ ] C06. 纹理 Texturing

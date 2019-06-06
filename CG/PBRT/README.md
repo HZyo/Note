@@ -6,15 +6,8 @@
 
 ## TODO
 
-- [x] [C01 导论 Introduction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C01.md) 
-  - [x] 1.1 文学编程 Literate Programming
-  - [x] 1.2 真实感绘制和光线追踪 Photorealistic Rendering and the Ray-Tracing Algorithm
-  - [x] 1.3 pbrt: 系统综述 pbrt: System Overview
-  - [x] 1.4 pbrt 并行 Parallelization of pbrt
-  - [x] 1.5 如何读书 How to Proceed Through this Book
-  - [x] 1.6 源码 Using and Understanding the code
-  - [x] 1.7 PBR简史 A Brief History of Physically Based Rendering
-- [ ] [C02 几何与变换 Geometry and Transformations](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C02.md) 
+- [x] [C01 导论 Introduction](notes/C01.md) 
+- [ ] [C02 几何与变换 Geometry and Transformations](notes/C02.md) 
   - [x] 2.1 坐标系 Coordinate Systems
   - [x] 2.2 向量 Vectors
   - [x] 2.3 点 Points
@@ -25,7 +18,7 @@
   - [x] 2.8 使用变换 Applying Transformations
   - [ ] *2.9 动画变化 Animating Transformations
   - [ ] 2.10 交互 Interactions
-- [ ] [C03 形状 Shapes](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C03.md) 
+- [ ] [C03 形状 Shapes](notes/C03.md) 
   - [x] 3.1 接口 Basic Shape Interface
   - [x] 3.2 球 Spheres
   - [ ] 3.3 柱面 Cylinders
@@ -35,7 +28,7 @@
   - [ ] *3.7 曲线 Curves
   - [ ] *3.8 细分曲面 Subdivision Surfaces
   - [ ] *3.9 舍入误差 Managing Rounding Error
-- [ ] [C04 图元和相交加速 Primitives and Intersection Acceleration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C04.md) 
+- [ ] [C04 图元和相交加速 Primitives and Intersection Acceleration](notes/C04.md) 
   - [ ] 4.1 图元接口和几何图元 Primitive Interface and Geometric primitives
   - [x] 4.2 聚合物 Aggregates
   - [ ] 4.3 层次包围盒 Bounding Volume Hierarchies
@@ -45,19 +38,19 @@
     - [x] 4.3.4 Compact BVH for Traversal
     - [x] 4.3.5 遍历 Traversal
   - [ ] 4.4 KD-Tree 加速器 KD-Tree Accelerator
-- [ ] [C05 颜色和辐射度学 Color and Radiometry](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C05.md) 
+- [ ] [C05 颜色和辐射度学 Color and Radiometry](notes/C05.md) 
   - [x] 5.1 谱表示 Spectral Representation
   - [ ] 5.2 `SampledSpectrum` 
   - [x] 5.3 `RGBSpectrum` 
   - [x] 5.4 辐射度量学 Radiometry
   - [x] 5.5 辐射积分 Radiometric Integrals
   - [x] 5.6 表面反射 Surface Reflection
-- [ ] [C06 相机模型 Camera Models](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C06.md) 
+- [ ] [C06 相机模型 Camera Models](notes/C06.md) 
   - [x] 6.1 相机模型 Camera Model
   - [x] 6.2 投影相机模型 Projective Camera Models
   - [x] 6.3 环境相机 Environment Camera
   - [ ] *6.4 真实相机 Realistic Cameras
-- [ ] [C07 采样和重建 Sampling and Reconstruction](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C07.md) 
+- [ ] [C07 采样和重建 Sampling and Reconstruction](notes/C07.md) 
   - [x] 7.1 采样理论 Sampling Theory
   - [x] 7.2 采样接口 Samping Interface
   - [x] 7.3 分层抽样 Stratified Sampling
@@ -77,7 +70,7 @@
 - [ ] C09 材质 Materials
 - [ ] C10 纹理 Texture
 - [ ] C11 体积散射 Volume Scattering
-- [ ] [C12 光源 Light Sources](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C12.md) 
+- [ ] [C12 光源 Light Sources](notes/C12.md) 
   - [x] 12.1 发光 Light Emission
   - [x] 12.2 光接口 Light Interface
   - [ ] 12.3 点光源 Point Light
@@ -87,7 +80,7 @@
   - [x] 12.4 远光 Distant Lights
   - [x] 12.5 面光源 Area Lights
   - [x] 12.6 无限区域面光源
-- [ ] [C13 蒙特卡洛积分 Monte Carlo Integration](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C13.md) 
+- [ ] [C13 蒙特卡洛积分 Monte Carlo Integration](notes/C13.md) 
   - [x] 13.1 背景与概率回顾 Background and Probability Review
   - [x] 13.2 蒙特卡洛估计 the Monte Carlo Estimator
   - [x] 13.3 采样随机变量 Samping Random Variables
@@ -105,7 +98,7 @@
   - [x] 13.8 仔细的样本布置 Careful Sample Placement
   - [x] 13.9 偏差 Bias
   - [x] 13.10 重要性采样 Importance Samping
-- [ ] [C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection](https://github.com/Ubpa/Note/blob/master/CG/PBRT/notes/C14.md) 
+- [ ] [C14 光传输 1: 表面反射 Light Transport 1: Surface Reflection](notes/C14.md) 
   - [ ] 14.1 采样反射函数 Sampling Reflection Functions
     - [x] 14.1.1 微面元 BxDFs Microfacet BxDFs
     - [x] 14.1.2 FresnelBlend

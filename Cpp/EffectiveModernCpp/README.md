@@ -4,15 +4,9 @@
 
 ## TODO
 
-- [x] [1 类型推断 Deducing Types](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C1.md) 
-  - [x] Item 1: 模板类型推断 template type deduction
-  - [x] Item 2: `auto` 
-  - [x] Item 3: `decltype` 
-  - [x] Item 4: 知道如何查看推断出的类型 Know how to view deduced types
-- [x] 2 [auto](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C2.md) 
-  - [x] Item 5: `auto` 
-  - [x] Item 6: 显式类型初始化器习语 Use the explicitly typed initializer idiom when `auto` deduces undesired types. 
-- [ ] 3 [迁移到现代 C++](https://github.com/Ubpa/Note/blob/master/Cpp/EffectiveModernCpp/notes/C3.md) 
+- [x] [1 类型推断 Deducing Types](notes/C1.md) 
+- [x] 2 [auto](notes/C2.md) 
+- [ ] 3 [迁移到现代 C++](notes/C3.md) 
   - [x] Item 7: 创建对象时区分 `()` 和 `{}` Distinguish between `()` and `{}` when creating objects 
   - [x] Item 8: `nullptr` 
   - [x] Item 9: `using` 

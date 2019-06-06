@@ -18,5 +18,5 @@
 - [ ] C07 多变量函数的积分学
 - [ ] C08 无穷级数
 - [ ] C09 含参变量积分
-- [x] [C10 傅里叶分析](https://github.com/Ubpa/Note/blob/master/Math/Intro2Calculus_ustc/notes/C10.md) 
+- [x] [C10 傅里叶分析](notes/C10.md) 
 
