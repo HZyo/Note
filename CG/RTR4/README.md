@@ -14,6 +14,10 @@
 - [ ] C08. 光和颜色 Light and Color
 - [ ] [C09. 基于物理着色 Physically Based Shading](notes/C09.md) 
   - [x] 9.1 物理光学 Physics of Light
+  - [x] 9.2 相机 The Camera
+  - [x] 9.3 BRDF
+  - [x] 9.4 光照 Illumination
+  - [x] 9.5 菲涅尔反射 Fresnel Reflectance
   - [ ] ...
 - [ ] C10. 局部光照 Local Illumination
 - [ ] C11. 全局光照 Global Illumination
