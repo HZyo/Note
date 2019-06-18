@@ -5,6 +5,7 @@
 - [AI](AI) 
   - [MIT_DB](AI/MIT_DB) 
 - [CG](CG) 
+  - [courses](CG/courses) 
   - [papers](CG/papers) 
   - [PBRT](CG/PBRT) 
   - [RTR4](CG/RTR4) 
