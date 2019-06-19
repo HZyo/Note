@@ -108,7 +108,7 @@ f_{d}&=\frac{\rho}{\pi}\left(1+F_{D 90}(1-\langle\mathbf{n} \cdot 1\rangle)^{5}\
 
 F_{D 90}&=0.5+\cos \left(\theta_{d}\right)^{2} \alpha\\
 
-\end{aligned}
+\end{aligned}
 $$
 
 > $\theta_d​$ 不知道指什么
@@ -284,6 +284,247 @@ Disney base material 使用下列参数
 - ...
 
 # 4. 光照 Lighting
+
+## 4.1 General
+
+lighting pipeline 应支持 high dynamic range HDR，光照处理必须在线性空间完成。管线的输入和输出都应该是 gamma corrected 的，Frostbite 选择依赖于 sRGB。
+
+一个可信的场景基于光照的一致性和正确性：所有物体从周围环境获取光照、反射光照且有阴影。主要准则是默认使所有物体正确，然后给 artist 调整。
+
+支持的光源
+
+- punctual light
+- photometric light
+- area light
+- emissive surface
+- IBL
+  - distant light probe (sky)
+  - localized light probe
+  - screen space reflections (SSR)
+
+一致性包括
+
+- material lighting：所有 BSDF 与所有光源类型正确交互
+- indirect-diffuse lighting：所有的光源类型都应考虑
+- indrect-specular lighting：SSR、localized light probes 和 distant light probes 应正确结合
+- light units：单位统一
+- decals：正确影响所有光源类型
+
+## 4.2 解析光源参数 Analytical light parameters
+
+将光的 hue（color）从 intensity 分离。用 color temperature 或 correlated color temperature (CCT) 来定义颜色，单位是 Kelvin (K)。
+
+从 color temperature 获取 hue 很困难，artist 也可以直接使用 RGB。
+
+只有 point 和 spot 是 punctual light，其他都是 area light
+
+![1560942163731](assets/1560942163731.png)
+
+## 4.3 光单位 Light unit
+
+> 细节很多，较难把握
+
+photometry 本质上是根据人眼的灵敏度加权的 radiometry。
+
+![1560942485636](assets/1560942485636.png)
+
+人眼灵敏度用 CIE photometric curve $V(\lambda)$ 表示。
+
+![1560942704697](assets/1560942704697.png)
+
+photometric 量与 radiometric 量的关系如下（积分区间是可见光谱 380nm - 780nm）
+$$
+X_{v}=K_{m} \cdot \int_{380}^{780} X_{e}(\lambda) V(\lambda) d \lambda
+$$
+其中常数 $K_m$ 是 the maximum spectral luminous efficacy of radiation for photoscopic vision，$K_m=683$。
+
+> 1 watt 的 555nm 灯是 683 lumens
+
+在 spectral 渲染器中，光源用 radiometric 单位描述。将其装换为像素经常需要 photometric weighted 过程。
+
+在 Frostbite 中，所有光源使用 photometric 单位。
+
+...
+
+## 4.4 Punctual lights
+
+Frostbite 只支持 point 和 spot 这两种 punctual light。为了物理正确，他们应遵循“平方反比定律”。
+
+![1560943664320](assets/1560943664320.png)
+
+公式为
+$$
+E=\frac{I}{\text {distance}^{2}}
+$$
+其中 $I$ 是 luminous intensity，E 是 illuminance。
+
+为了避免数值问题，通常给添加一个下限
+$$
+E=\frac{I}{\max \left(\text {distance}^{2}, 0.01^{2}\right)}
+$$
+在 Frostbite 中，artists 可以读 punctual light intensity 使用 luminous power 或 luminous intensity 作为单位。光照计算中，luminous power 总是会转换成 luminous intensity，转换关系如下
+
+- 点光源 Point light
+  $$
+  \phi=\int_{S} I \mathrm{dl}=\int_{0}^{2 \pi} \int_{0}^{\pi} I \mathrm{d} \theta \mathrm{d} \phi=4 \pi I
+  $$
+
+- 聚光灯 Spot light
+  $$
+  \phi=\int_{\Omega} I \mathrm{dl}=\int_{0}^{2 \pi} \int_{0}^{\theta_{\text { outer }}} I \mathrm{d} \theta \mathrm{d} \phi=2 \pi\left(1-\cos \frac{\theta_{\text { outer }}}{2}\right) I
+  $$
+
+  > 常见的是用 inner 和 outer 角度来设定 spot light 的，因此可推出不同的公式
+
+相同的 luminous power，张角越小则越亮
+
+![1560945333299](assets/1560945333299.png)
+
+这种耦合使得 artist 很难操作，因此在 Frostbite 中 spot light 单位转换设定为
+$$
+\phi = \pi I
+$$
+转换关系总结如下
+
+- Point
+  $$
+  \frac{\phi}{4 \pi}
+  $$
+
+- Spot
+  $$
+  \frac{\phi}{2 \pi\left(1-\cos \frac{\theta_{\text { outer }}}{2}\right)} \text { or } \frac{\phi}{\pi}
+  $$
+
+- Frustum
+  $$
+  \frac{\phi}{4 \arcsin \left[\sin \left(\frac{\theta_{a}}{2}\right) \sin \left(\frac{\theta_{b}}{2}\right)\right]}
+  $$
+
+  > Frustum light 在 Frostbite 中视为面光源，因此他们不会使用这个公式
+  >
+  > 只是偶尔用一下，并不能像 punctual light 那样使用有效的 lighting path
+
+光照计算
+
+- Point light
+  $$
+  \begin{aligned}
+  L_{o u t}
+  &= f(\mathbf{v}, \mathbf{l}) E\\
+  &= f(\mathbf{v}, \mathbf{l}) L_{i n}\langle\mathbf{n} \cdot \mathbf{l}\rangle\\
+  &= f(\mathbf{v}, \mathbf{l}) \frac{I}{\text {distance}^{2}}\langle\mathbf{n} \cdot \mathbf{l}\rangle\\
+  &= f(\mathbf{v}, \mathbf{l}) \frac{\phi}{4 \pi \text { distance }^{2}}\langle\mathbf{n} \cdot \mathbf{l}\rangle\\
+  \end{aligned}
+  $$
+
+- Spot light
+  $$
+  \begin{aligned}
+  L_{o u t}&=f(\mathbf{v}, \mathbf{l}) \frac{I}{\text{distance}^{2}}\langle\mathbf{n} \cdot \mathbf{l}\rangle\\
+  &= f(\mathbf{v}, \mathbf{l}) \frac{\phi}{\pi \text { distance }^{2}}\langle\mathbf{n} \cdot \mathbf{l}\rangle \text {getAngleAttenuation}( )
+  \end{aligned}
+  $$
+
+出于性能考虑，渲染器会实现一个有限灯光范围以支持灯光裁剪算法。Frostbite 所用的如下
+$$
+E_{\text {window} 1}=\left(\frac{I}{\text {distance}^{2}}\right) \operatorname{saturate}\left(1-\frac{\text {distance}^{n}}{\text {light} \text {Radius}^{n}}\right)^{2}
+$$
+其中 n = 4，同于 Karis[^Kar13]。这个函数用于所有 punctual light 和 area light，然而并不能很好符合非球形 non-spherical shape 如 tube 或 rectangle light。
+
+本节相关代码如下
+
+```c++
+float smoothDistanceAtt ( float squaredDistance , float invSqrAttRadius )
+{
+    float factor = squaredDistance * invSqrAttRadius ;
+    float smoothFactor = saturate (1.0 f - factor * factor );
+    return smoothFactor * smoothFactor;
+}
+
+float getDistanceAtt ( float3 unormalizedLightVector , float invSqrAttRadius )
+{
+    float sqrDist = dot ( unormalizedLightVector , unormalizedLightVector );
+    float attenuation = 1.0 / (max ( sqrDist , 0.01*0.01) );
+    attenuation *= smoothDistanceAtt ( sqrDist , invSqrAttRadius );
+    
+    return attenuation ;
+}
+
+float getAngleAtt ( float3 normalizedLightVector , float3 lightDir ,
+float lightAngleScale , float lightAngleOffset )
+{
+    // On the CPU
+    // float lightAngleScale = 1.0 f / max (0.001f, ( cosInner - cosOuter ));
+    // float lightAngleOffset = -cosOuter * angleScale ;
+    
+    float cd = dot ( lightDir , normalizedLightVector );
+    float attenuation = saturate (cd * lightAngleScale + lightAngleOffset );
+    // smooth the transition
+    attenuation *= attenuation ;
+    
+    return attenuation ;
+}
+
+// Process punctual light
+float3 unnormalizedLightVector = lightPos - worldPos ;
+float3 L = normalize ( unnormalizedLightVector );
+float att = 1;
+att *= getDistanceAtt ( unormalizedLightVector , lightInvSqrAttRadius );
+att *= getAngleAtt (L, lightForward , lightAngleScale , lightAngleOffset );
+
+// lightColor is the outgoing luminance of the light time the user light color
+// i.e with point light and luminous power unit : lightColor = color * phi / (4 * PI)
+float3 luminance = BSDF (...) * saturate ( dot (N, L)) * lightColor * att ;
+```
+
+## 4.5 Photometric lights
+
+photometric lights 使用 photometric profile 来描述强度分布。这些分布保存在文件中，常见的格式是 IES(.ies) 和 EULUMDAT (.ldt，简单的 ASCII 文件)。相关资源网站如 [Lithonia](www.lithonia.com)。
+
+这些文件存储了多种角度的 luminous intensity。
+
+![1560950205681](assets/1560950205681.png)
+
+> ...
+
+artists 可以使用 IES 作为 mask 来制造阴影
+
+![1560950453717](assets/1560950453717.png)
+
+## 4.6 Sun
+
+太阳从地球上看的角度在 $[0.526^\circ, 545^\circ]$，即对应的立体角为 $[0.000066,0.000071]$。将太阳视为 punctual light 对 diffuse 部分是一个可接受的近似，然而对于 specular 会有问题。在 Frostbite 中，为了部分减轻这个问题，太阳处理成一个远处的面光源，垂直于 outer hemisphere。
+
+> Outer Sphere 是什么？一个圆盘垂直于一个半球？
+
+artists 要配置垂直于太阳方向的表面的 illuminance (lux)。 
+
+光照计算如下
+$$
+L_{o u t}=f(\mathbf{v}, \mathbf{l}) E=f(\mathbf{v}, \mathbf{l}) E_{\perp}\langle\mathbf{n} \cdot \mathbf{l}\rangle
+$$
+对应的代码为
+
+```c++
+float3 D = sunDirection ;
+float r = sin( sunAngularRadius ); // Disk radius
+float d = cos( sunAngularRadius ); // Distance to disk
+
+// Closest point to a disk ( since the radius is small , this is
+// a good approximation
+float DdotR = dot (D, R);
+float3 S = R - DdotR * D;
+float3 L = DdotR < d ? normalize (d * D + normalize (S) * r) : R;
+// Diffuse and specular evaluation
+float illuminance = sunIlluminanceInLux * saturate ( dot (N, D));
+
+// D: Diffuse direction use for diffuse lighting
+// L: Specular direction use with specular lighting
+luminance = BSDF (V, D, L, data ) * illuminance ;
+```
+
+## 4.7 Area lights
 
 
 
