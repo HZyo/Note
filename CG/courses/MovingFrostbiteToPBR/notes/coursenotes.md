@@ -427,9 +427,11 @@ $$
   $$
 
 出于性能考虑，渲染器会实现一个有限灯光范围以支持灯光裁剪算法。Frostbite 所用的如下
+
 $$
 E_{\text {window} 1}=\left(\frac{I}{\text {distance}^{2}}\right) \operatorname{saturate}\left(1-\frac{\text {distance}^{n}}{\text {light} \text {Radius}^{n}}\right)^{2}
 $$
+
 其中 n = 4，同于 Karis[^Kar13]。这个函数用于所有 punctual light 和 area light，然而并不能很好符合非球形 non-spherical shape 如 tube 或 rectangle light。
 
 本节相关代码如下
@@ -526,7 +528,531 @@ luminance = BSDF (V, D, L, data ) * illuminance ;
 
 ## 4.7 Area lights
 
+Frostbite 支持四种面光源：sphere、disk、tube 和 rectangle。
 
+计算公式为
+
+$$
+L_\text{out}=\int_{\Omega^{+}} f(\mathbf{v}, \mathbf{l}) V(\mathbf{l}) L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l}=\int_{\Omega_{\mathrm{light}}} f(\mathbf{v}, \mathbf{l})  L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle
+$$
+
+如果面光源可以从阴影点到达，则函数 V 是 1，否则为 0。函数 V 使得我们可以同时考虑面光源的形状和阴影。本节中我们不考虑引用（在[第 4.10.4 节](#4.10.4)考虑）。$\Omega_\text{light}$ 是面光源所占的立体角。
+
+积分可按面积积分
+
+![1560999695226](assets/1560999695226.png)
+$$
+L_\text{out}=\int_{A} f(\mathbf{v}, \mathbf{l}) L_\text{in} \frac{\langle\mathbf{n} \cdot \mathbf{l}\rangle\left\langle \mathbf{n}_{a} \cdot-\mathbf{l}\right\rangle}{\text{distance}^{2}} \mathrm{d} A
+$$
+这个方程不总是有解析解，但可以用蒙特卡洛积分和重要性采样进行数值积分。这个计算很耗费时间，我们设计了近似解。引擎内置的参考模式可用来检验近似解的准确性。
+
+diffuse 和 specular 的光照积分要分开讨论
+$$
+\begin{aligned}
+
+L_\text{out}
+
+&=\int_{\Omega_\text{light}} f_{d}(\mathbf{v}, \mathbf{l}) L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle d \mathbf{l}
+
+=\int_{A} f_{d}(\mathbf{v}, \mathbf{l}) L_\text{in} \frac{\langle\mathbf{n} \cdot \mathbf{l}\rangle\left\langle\mathbf{n}_{a} \cdot-\mathbf{l}\right\rangle}{\text{distance}^{2}} \mathrm{d} A\\
+
+L_\text{out}
+
+&=\int_{\Omega_\text{light}} f_{r}(\mathbf{v}, \mathbf{l}) L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle d \mathbf{l}
+
+=\int_{A} f_{r}(\mathbf{v}, \mathbf{l}) L_\text{in} \frac{\langle\mathbf{n} \cdot \mathbf{l}\rangle\left\langle\mathbf{n}_{a} \cdot-\mathbf{l}\right\rangle}{\text{distance}^{2}} \mathrm{d} A\\
+
+\end{aligned}
+$$
+
+> area light 没有用于生产中，目标用于 30 fps 游戏和电影。
+
+### 4.7.1 面光源单位 Area light unit
+
+artists 可选择两种单位
+
+- Luminous power：光出射的总量，不受光源大小的影响，但越大的光源产生的高光会越暗，因为 power 会在 area 上均分。
+
+  ![1561001291033](assets/1561001291033.png)
+
+- Luminance：描述了表面功率。总能量与光源大小相关。光源产生的高光不随光源大小变化。
+
+  ![1561003297325](assets/1561003297325.png)
+
+实践中，artist 很少使用 luminance。
+
+为了光照计算便利，我们会将 luminance power 转换成 luminance，Lambertian emitter 光源的转换关系如下
+$$
+L=\frac{\phi}{A \int_{\Omega^{+}}\langle \mathbf{l} \cdot \mathbf{n}\rangle \mathrm{d} \mathbf{l}}=\frac{\phi}{A \pi}
+$$
+对于四种面光源，具体的转换关系如下
+
+- Sphere
+  $$
+  \frac{\phi}{4 \text { radius }^{2} \pi^{2}}
+  $$
+
+- Disk
+  $$
+  \frac{\phi}{\text{radius}^{2} \pi^{2}}
+  $$
+
+- Tube
+  $$
+  \frac{\phi}{\left(2 \pi\ \text{radius}\ \text{width} + 4 \pi\ \text{radius} ^{2}\right) \pi}
+  $$
+
+- Rectangle
+  $$
+  \frac{\phi}{\text{width}\ \text{height}\ \pi}
+  $$
+
+punctual light 没有面积，因此只能使用 luminous intensity 作为单位，如果 artist 用 luminance 作为单位，那么就将这些 punctual light 视为 1 cm 的小面光源。
+
+### 4.7.2 Diffuse area lights
+
+#### 4.7.2.1 General
+
+首先我们用 Lambertian diffuse BRDF $\frac{\rho}{\pi}$ 来解光照积分，先不用 Disney diffuse BRDF。假设面光源有恒定的 $L_\text{in}$。因此 diffuse 光照积分为
+$$
+L_\text{o u t}=\frac{\rho}{\pi} \int_{\Omega_{\text {light}}} L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle=\frac{\rho}{\pi} E(n)
+$$
+其中 illuminance E 为
+$$
+E(n)=\int_{\Omega_{\text { light }}} L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l}=\int_{A} L_\text{in} \frac{\langle\mathbf{n} \cdot \mathbf{l}\rangle\left\langle\mathbf{n}_{a} \cdot-\mathbf{l}\right\rangle}{\text{distance}^{2}} \mathrm{d} A
+$$
+平方反比不适用于面光源。只能用上式进行计算。
+
+面光源能覆盖很大范围的立体角，且可能部分位于着色点所在平面（由法向定义）之下。
+
+![1561004226932](assets/1561004226932.png)
+
+> 示例
+>
+> ![1561006970735](assets/1561006970735.png)
+>
+> 作图时参考，右图中没有 horizon handling
+
+有一些方法可以用来求解上述积分方程。有的要求面光源只占一小部分立体角，并且不考虑 horizon handling。有的考虑了 horizon handling 但 intensity 不正确。如果既考虑了 horizon handling 又有正确的 intensity，那么将其称为 "correctly handling the horizon"。
+
+积分很复杂，但一些情况下存在解析解。在 light transport 和 hear transfer 领域内有解决方案。
+
+在 light transport 中，form factor 如下
+$$
+\text{FoormFactor}=\int_{x \in P_{i}} \int_{y \in P_{j}} \frac{\cos \theta \cos \theta^{\prime}}{\pi r^{2}} V(x, y) \mathrm{d} x \mathrm{d} y
+$$
+因此，illuminance 变为
+$$
+E(n)=\int_{\Omega_{\text { light }}} L_{i n}\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l}= L_{i n} \pi\ \text{FormFactor}
+$$
+在 radiative transfer 中，有一个等价的公式，称为 view factor。为了简化，两者都称为 form factor。form factor 的公式可能是也可能不是 correctly handling the horizon。
+
+对于 sphere 和 disk 面光源，我们使用了 form factor。
+
+#### 4.7.2.2 Sphere area lights
+
+有两种方法
+
+- Quilez[^Qui06] 给出的方法没有考虑 horizon handling，并且要求小立体角。类似于 "Patch to a sphere frontal"，Quilez 的版本使用了 $\langle\mathbf{n} \cdot 1\rangle$ 来处理球心不在表面方向处的情形
+
+  > 示例
+  >
+  > ![1561008742943](assets/1561008742943.png)
+  >
+  > 绿色部分是正确部分，可以看到对于大球光源，正确的部分变少了
+
+- "Pathch to a sphere tilted"[^Mar14] correctly handling the horizon
+
+两种方法的适用情况如下
+
+![1561009706360](assets/1561009706360.png)
+
+实现代码为
+
+```c++
+float3 Lunormalized = lightPos - worldPos ;
+float3 L = normalize ( Lunormalized );
+float sqrDist = dot ( Lunormalized , Lunormalized );
+
+#if WITHOUT_CORRECT_HORIZON // Analytical solution above horizon
+
+    // Patch to Sphere frontal equation ( Quilez version )
+    float sqrLightRadius = light . radius * light . radius ;
+    // Do not allow object to penetrate the light ( max )
+    // Form factor equation include a (1 / FB_PI ) that need to be cancel
+    // thus the " FB_PI *"
+    float illuminance = FB_PI *
+        ( sqrLightRadius / ( max( sqrLightRadius , sqrDist ))) * saturate ( dot (     worldNormal , L));
+
+# else // Analytical solution with horizon
+
+    // Tilted patch to sphere equation
+    float Beta = acos ( dot ( worldNormal , L));
+    float H = sqrt ( sqrDist );
+    float h = H / radius ;
+    float x = sqrt (h * h - 1);
+    float y = -x * (1 / tan ( Beta ));
+
+    float illuminance = 0;
+    if (h * cos ( Beta ) > 1)
+        illuminance = cos ( Beta ) / (h * h);
+    else
+    {
+        illuminance = (1 / ( FB_PI * h * h)) *
+            ( cos ( Beta ) * acos (y) - x * sin ( Beta ) * sqrt (1 - y * y)) +
+            (1 / FB_PI ) * atan ( sin ( Beta ) * sqrt (1 - y * y) / x);
+    }
+
+    illuminance *= FB_PI ;
+
+# endif
+```
+
+#### 4.7.2.3 Disk area light
+
+有两种方法
+
+- Coombe[^CH05] 给出的方法没有考虑 horizon handling，而且朝向有限制
+- radiative transfer 中的方法[^HSM10b] 考虑了 horizon handling，但是限制了 tilted plane 和无朝向的 disk。为了考虑朝向，我们在公式中额外乘了 $\left\langle\mathbf{n}_{\text { light }} \cdot-\mathbf{l}\right\rangle$。这个修改适用于 horizon 之上且占小立体角的情形，其他情况下有小的偏差。结果足够好了。
+
+![1561011234921](assets/1561011234921.png)
+
+> 示例
+>
+> ![1561011457738](assets/1561011457738.png)
+>
+> 左图是考虑了 horizon handling 的结果，右图是真值
+
+代码如下
+
+```c++
+float cot ( float x) { return cos (x) / sin (x); }
+float acot ( float x) { return atan (1 / x); }
+
+#if WITHOUT_CORRECT_HORIZON // Analytical solution above horizon
+
+    // Form factor equation include a (1 / FB_PI ) that need to be cancel
+    // thus the " FB_PI *"
+    float illuminance = FB_PI * saturate ( dot ( planeNormal , -L)) *
+    saturate ( dot( worldNormal , L)) /
+        ( sqrDist / ( radius * radius ) + 1);
+
+# else // Analytical solution with horizon
+
+    // Nearly exact solution with horizon
+    float h = length ( lightPos - worldPos );
+    float r = lightRadius ;
+    float theta = acos ( dot ( worldNormal , L));
+    float H = h / r;
+    float H2 = H * H;
+    float X = pow ((1 - H2 * cot ( theta ) * cot ( theta )), 0.5) ;
+
+    float illuminance = 0;
+    if ( theta < acot (1 / H))
+    {
+        illuminance = (1 / (1 + H2)) * cos ( theta );
+    }
+    else
+    {
+        illuminance = -H * X * sin ( theta ) / ( FB_PI * (1 + H2)) +
+            (1 / FB_PI ) * atan (X * sin ( theta ) / H) +
+            cos ( theta ) * ( FB_PI - acos (H * cot ( theta ))) / ( FB_PI * (1 + H2));
+    }
+
+    // Multiply by saturate ( dot ( planeNormal , -L)) to better match ground
+    // truth . Matches well with the first part of the equation but there
+    // is a discrepancy with the second part . Still an improvement and it is
+    // good enough .
+    illuminance *= FB_PI * saturate (dot( planeNormal , -L));
+
+# endif
+```
+
+在 Frostbite 中，disk area light 和 spot light 类似，也可以支持 angular attenuation。
+
+```c++
+// On the CPU
+float3 virtualPos = lightPos + lightForward * ( discRadius / tan ( halfOuterAngle ))
+
+// On the GPU
+// Attenuate with a virtual position which is the light position shifted
+// in opposite light direction by an amount based on the outer angle .
+illuminance *= getAngleAtt ( normalize ( virtualPos - worldPos ), lightForward , lightAngleScale , lightAngleOffset );
+```
+
+#### 4.7.2.4 Sphere and disk area lights merging
+
+sphere 和 disk 的计算类似，因此两者可合并
+
+```c++
+// A right disk is a disk oriented to always face the lit surface .
+// Solid angle of a sphere or a right disk is 2 PI (1 - cos ( subtended angle )).
+// Subtended angle sigma = arcsin (r / d) for a sphere
+// and sigma = atan (r / d) for a right disk
+// sinSigmaSqr = sin( subtended angle )^2, it is (r^2 / d ^2) for a sphere
+// and (r^2 / ( r^2 + d ^2) ) for a disk
+// cosTheta is not clamped
+float illuminanceSphereOrDisk ( float cosTheta , float sinSigmaSqr )
+{
+    float sinTheta = sqrt (1.0 f - cosTheta * cosTheta );
+
+    float illuminance = 0.0 f;
+    // Note : Following test is equivalent to the original formula .
+    // There is 3 phase in the curve : cosTheta > sqrt ( sinSigmaSqr ),
+    // cosTheta > -sqrt ( sinSigmaSqr ) and else it is 0
+    // The two outer case can be merge into a cosTheta * cosTheta > sinSigmaSqr
+    // and using saturate ( cosTheta ) instead .
+    if ( cosTheta * cosTheta > sinSigmaSqr )
+    {
+        illuminance = FB_PI * sinSigmaSqr * saturate ( cosTheta );
+    }
+    else
+    {
+        float x = sqrt (1.0 f / sinSigmaSqr - 1.0 f); // For a disk this simplify to x = d / r
+        float y = -x * ( cosTheta / sinTheta );
+        float sinThetaSqrtY = sinTheta * sqrt (1.0 f - y * y);
+        illuminance = ( cosTheta * acos (y) - x * sinThetaSqrtY ) * sinSigmaSqr + atan (
+            sinThetaSqrtY / x);
+}
+
+    return max ( illuminance , 0.0 f);
+}
+
+// Sphere evaluation
+float cosTheta = clamp ( dot ( worldNormal , L), -0.999 , 0.999) ; // Clamp to avoid edge case
+// We need to prevent the object penetrating into the surface
+// and we must avoid divide by 0, thus the 0.9999 f
+float sqrLightRadius = lightRadius * lightRadius ;
+float sinSigmaSqr = min( sqrLightRadius / sqrDist , 0.9999 f);
+float illuminance = illuminanceSphereOrDisk ( cosTheta , sinSigmaSqr );
+
+// Disk evaluation
+float cosTheta = dot ( worldNormal , L);
+float sqrLightRadius = lightRadius * lightRadius ;
+// Do not let the surface penetrate the light
+float sinSigmaSqr = sqrLightRadius / ( sqrLightRadius + max ( sqrLightRadius , sqrDist ));
+// Multiply by saturate ( dot ( planeNormal , -L)) to better match ground truth .
+float illuminance = illuminanceSphereOrDisk ( cosTheta , sinSigmaSqr )
+* saturate ( dot( planeNormal , -L));
+```
+
+#### 4.7.2.5 Rectangular area lights
+
+几种情况如下
+
+![1561012808956](assets/1561012808956.png)
+
+没有找到考虑了 horizon handling 的简单 form factor 解决方案。因此得使用替代方案。
+
+Drobot 给出了近似解，利用了一个最具代表性的 diffuse point lihgt 加以立体角权重
+$$
+E(\mathbf{n})=\int_{\Omega_{\text { light }}} L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l} \approx \Omega_{\text { light }} L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle
+$$
+
+这个近似对小的立体角有效，上式通过仔细选择 $\mathbf{l}$ 可以使其扩展到大立体角情形，该点成为 Most Representative Point (MRP)。
+
+retangle 立体角的计算有解析解[^UFK13]，但没有考虑 horizon handling。出于性能考虑，对 $\Omega_\text{light}​$ 的估计不考虑 horizon handling，直接计算直角椎体的立体角 rihgt pyramid solid angle[^Pla]。
+
+```c++
+1 float rightPyramidSolidAngle ( float dist , float halfWidth , float halfHeight )
+{
+    float a = halfWidth ;
+    float b = halfHeight ;
+    float h = dist ;
+    
+    return 4 * asin (a * b / sqrt ((a * a + h * h) * (b * b + h * h)));
+}
+
+
+float rectangleSolidAngle ( float3 worldPos ,
+    float3 p0 , float3 p1 ,
+    float3 p2 , float3 p3)
+{
+    float3 v0 = p0 - worldPos ;
+    float3 v1 = p1 - worldPos ;
+    float3 v2 = p2 - worldPos ;
+    float3 v3 = p3 - worldPos ;
+
+    float3 n0 = normalize ( cross (v0 , v1));
+    float3 n1 = normalize ( cross (v1 , v2));
+    float3 n2 = normalize ( cross (v2 , v3));
+    float3 n3 = normalize ( cross (v3 , v0));
+
+    float g0 = acos ( dot (-n0 , n1));
+    float g1 = acos ( dot (-n1 , n2));
+    float g2 = acos ( dot (-n2 , n3));
+    float g3 = acos ( dot (-n3 , n0));
+
+    return g0 + g1 + g2 + g3 - 2 * FB_PI ;
+}
+```
+
+MRP 方法的质量依赖于立体角的准确估计。然而这估计较为困难，不适合于实时计算。
+
+我们使用了替代方法 Stryctyre sampling of light shape
+
+易知
+$$
+\int_{\Omega} f(x) \mathrm{dl}=\Omega \text { Average }[f(x)]
+$$
+因此，对于 illuminance 有
+$$
+E(n)=\int_{\Omega_{\text { light }}} L_{i n}\langle\mathbf{n} \cdot 1\rangle \mathrm{d} \mathbf{l}=\Omega_{\text { light }} L_{i n} \text { Average }[\langle\mathbf{n} \cdot \mathbf{1}\rangle]
+$$
+这个均值的难以求得，可以采样估计。对于 retangular llight，我们使用 4 个角点和中心点
+$$
+E(n)=\int_{\Omega_{\text{light}}} L_\text{in}\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l} \approx \Omega_{\text{light}} L_\text{in} \frac{1}{N} \sum_{i=1}^{N} \max \left(\left\langle\mathbf{n} \cdot \mathbf{l}_{i}\right\rangle, 0\right)
+$$
+这种方法通过 clamp 余弦值，隐式地考虑了 horizon handling。
+
+这个方法有几乎不明显的 artifact，此由过少的样本产生。
+
+![1561016204975](assets/1561016204975.png)
+
+实现代码为
+
+```c++
+if ( dot ( worldPos - lightPos , lightPlaneNormal ) > 0)
+{
+    float halfWidth = lightWidth * 0.5;
+    float halfHeight = lightHeight * 0.5;
+    float3 p0 = lightPos + lightLeft * -halfWidth + lightUp * halfHeight ;
+    float3 p1 = lightPos + lightLeft * -halfWidth + lightUp * - halfHeight ;
+    float3 p2 = lightPos + lightLeft * halfWidth + lightUp * - halfHeight ;
+    float3 p3 = lightPos + lightLeft * halfWidth + lightUp * halfHeight ;
+    float solidAngle = rectangleSolidAngle ( worldPos , p0 , p1 , p2 , p3);
+
+    float illuminance = solidAngle * 0.2 * (
+    saturate ( dot( normalize (p0 - worldPos ), worldNormal ) +
+    saturate ( dot( normalize (p1 - worldPos ), worldNormal ))+
+    saturate ( dot( normalize (p2 - worldPos ), worldNormal ))+
+    saturate ( dot( normalize (p3 - worldPos ), worldNormal ))+
+    saturate ( dot( normalize ( lightPos - worldPos ), worldNormal )));
+}
+```
+
+#### 4.7.2.6 Tube area light
+
+在 Frostbite 中，tube area light 是一个 capsule（一个圆柱 + 2 个半球）。
+
+![1561017008748](assets/1561017008748.png)
+
+form factor 和 solid angle 都难以计算，难以实时计算。
+
+我们将 capsule 分割为 1 个圆柱和 2 个半球，并利用之前的结果
+
+- 圆柱体视为一个正对的等大 rectangular lihgt
+- 两个半球视为一个位于圆柱轴上离着色点最近的位置的球
+- 两者叠加
+
+效果如下，很接近真值
+
+![1561017730667](assets/1561017730667.png)
+
+实现代码为
+
+```c++
+// Return the closest point on the line ( without limit )
+float3 closestPointOnLine ( float3 a, float3 b, float3 c)
+{
+    float3 ab = b - a;
+    float t = dot(c - a, ab) / dot (ab , ab);
+    return a + t * ab;
+}
+
+// Return the closest point on the segment ( with limit )
+float3 closestPointOnSegment ( float3 a, float3 b, float3 c)
+{
+    float3 ab = b - a;
+    float t = dot(c - a, ab) / dot(ab , ab);
+    return a + saturate (t) * ab;
+}
+
+// The sphere is placed at the nearest point on the segment .
+// The rectangular plane is define by the following orthonormal frame :
+float3 forward = normalize ( closestPointOnLine (P0 , P1 , worldPos ) - worldPos );
+float3 left = lightLeft ;
+float3 up = cross ( lightLeft , forward );
+
+float3 p0 = lightPos - left * (0.5 * lightWidth ) + lightRadius * up;
+float3 p1 = lightPos - left * (0.5 * lightWidth ) - lightRadius * up;
+float3 p2 = lightPos + left * (0.5 * lightWidth ) - lightRadius * up;
+float3 p3 = lightPos + left * (0.5 * lightWidth ) + lightRadius * up;
+
+float solidAngle = rectangleSolidAngle ( worldPos , p0 , p1 , p2 , p3);
+
+float illuminance = solidAngle * 0.2 * (
+saturate ( dot ( normalize (p0 - worldPos ), worldNormal )) +
+saturate ( dot ( normalize (p1 - worldPos ), worldNormal )) +
+saturate ( dot ( normalize (p2 - worldPos ), worldNormal )) +
+saturate ( dot ( normalize (p3 - worldPos ), worldNormal )) +
+saturate ( dot ( normalize ( lightPos - worldPos ), worldNormal )));
+
+// We then add the contribution of the sphere
+float3 spherePosition = closestPointOnSegment (P0 , P1 , worldPos );
+float3 sphereUnormL = spherePosition - worldPos ;
+float3 sphereL = normalize ( sphereUnormL );
+float sqrSphereDistance = dot ( sphereUnormL , sphereUnormL );
+
+float illuminanceSphere = FB_PI * saturate ( dot ( sphereL , data . worldNormal )) *
+    (( lightRadius * lightRadius ) / sqrSphereDistance );
+
+illuminance += illuminanceSphere ;
+```
+
+### 4.7.3 Five times rule
+
+当面光源与着色点距离比较大时，平方反比定律是可能可行的近似。一个经验规律是 the five times rule[^Rye]：*与光源的距离应该大于其直径的 5 倍*。
+
+> *"the distance to a light source should be greater than five times the largest dimension of the sources"*  
+
+在实践中并没有去做这个优化。
+
+### 4.7.4 Diffuse area light with Disney diffuse
+
+之前的推导中没有使用 Disney diffuse，我们只对一个光源方向进行计算，公式为
+$$
+L_{o u t}=f_{d}(\mathbf{v}, \mathbf{l}) E(n)
+$$
+这个光源方向可以用光源位置进行计算，也可以利用 Drobot 方法中的 MRP。
+
+对比如下
+
+![1561019316021](assets/1561019316021.png)
+
+MRP 更接近于真值。
+
+### 4.7.5 Specular area lights
+
+specular area light 在实时的限制下非常复杂。BRDF 的参数多，光源配置参数多使得其难以预计算。
+
+最终我们使用了 Karis 的 shortest distance form reflection ray 方法[^Kar13]，能量守恒存在问题，并且在 grazing angle 处表现不好。
+
+效果如下（左图为 Karis 方法，右图为参考）
+
+![1561020266975](assets/1561020266975.png)
+
+用 BRDF 的 dominant direction 去替代反射方向有微小的提升
+
+![1561020406621](assets/1561020406621.png)
+
+```c++
+float3 getSpecularDominantDirArea ( float3 N, float3 R, float NdotV , float roughness )
+{
+    // Simple linear approximation
+    lerpFactor = (1 - roughness );
+    
+    return normalize ( lerp (N, R, lerpFactor ));
+}
+```
+
+## 4.8 Emissive surfaces
+
+## 4.9 Image besed lights
+
+## 4.10 Shadow and occlusion
+
+## 4.11 Deferred / Forward rendering
 
 # 5. 图像 Image
 
@@ -540,13 +1066,29 @@ luminance = BSDF (V, D, L, data ) * illuminance ;
 
 [^Bur12]: B. Burley. "[**Physically Based Shading at Disney**](http://selfshadow.com/publications/s2012-shading-course/)". In: Physically Based Shading in Film and Game Production, ACM SIGGRAPH 2012 Courses. SIGGRAPH ’12. Los Angeles, California: ACM, 2012, 10:1{7. isbn: 978-1-4503-1678-1. doi: 10.1145/2343483.2343493.
 
+[^CH05]: G. Coombe and M. Harris. "**Global Illumination Using Progressive Refinement Radiosity**". In: GPU Gems 2. Ed. by M. Pharr. Addison-Wesley, 2005, pp. 635-647.
+
 [^Dro13]: M. Drobot. "[**Lighting of Killzone: Shadow Fall**](http://www.guerrilla-games.com/publications/)". In: Digital Dragons. 2013.
 
-[^Hei14]: E. Heitz. "[**Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs**](http://jcgt.org/published/0003/02/03/)". In: Journal of Computer Graphics Techniques (JCGT) 3.2 (June 2014), pp. 32{91. issn: 2331-7418.
+[^Dro14b]: M. Drobot. "**Physically Based Area Lights**". In: GPU Pro 5. Ed. by W. Engel. CRC Press, 2014, pp. 67-100.
 
-[^Kar13]: B. Karis. "[**Real Shading in Unreal Engine 4**](http://selfshadow.com/publications/s2013-shading-course/)". In: Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses. SIGGRAPH ’13. Anaheim, California: ACM, 2013, 22:1{22:8. isbn: 978-1-4503-2339-0. doi: 10.1145/2504435.2504457.
+[^Hei14]: E. Heitz. "[**Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs**](http://jcgt.org/published/0003/02/03/)". In: Journal of Computer Graphics Techniques (JCGT) 3.2 (June 2014), pp. 32-91. issn: 2331-7418.
+
+[^HSM10b]: J. R. Howell, R. Siegel, and M. P. Meng¨u¸c. 2010. http://www.thermalradiation.net/sectionb/B-13.html
+
+[^Kar13]: B. Karis. "[**Real Shading in Unreal Engine 4**](http://selfshadow.com/publications/s2013-shading-course/)". In: Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses. SIGGRAPH ’13. Anaheim, California: ACM, 2013, 22:1-22:8. isbn: 978-1-4503-2339-0. doi: 10.1145/2504435.2504457.
 
 [^Koj+13]: H. Kojima, H. Sasaki, M. Suzuki, and J. Tago. "[**Photorealism Through the Eyes of a FOX: The Core of Metal Gear Solid Ground Zeroes**](http://www.gdcvault.com/play/1018086/Photorealism-Through-the-Eyes-of)". In: Game Developers Conference. 2013.
 
 [^LH13]: S. Lagarde and L. Harduin. "[**The Art and Rendering of Remember Me**](http://seblagarde.wordpress.com/2013/08/22/gdceurope-2013-talk-the-art-and-rendering-of-remember-me/)". In: Game Developers Conference Europe. 2013.
+
+[^Mar14]: I. Mart´ınez. [**Radiative view factors**](http://webserver.dmt.upm.es/~isidoro/tc3/Radiation%5C%20View%5C%20factors.pdf). 1995-2014.
+
+[^Pla]: PlanetMath. [**Solid angle of rectangular pyramid**](http://planetmath.org/solidangleofrectangularpyramid).
+
+[^Qui06]: I. Qu´ılez. [**Sphere ambient occlusion**](http://www.iquilezles.org/www/artiles/sphereao/sphereao.htm). 2006.
+
+[^Rye]: A. Ryer. [**Light Measurement Handbook**](http://www.intl-lighttech.com/services/ilt-light-measurement-handbook). International Light Technologies Inc.
+
+[^UFK13]: C. Ure~na, M. Fajardo, and A. King. “[**An Area-Preserving Parametrization for Spherical Rectangles**](https://www.solidangle.com/arnold/research/ )". In: Computer Graphics Forum 32.4 (2013), pp. 59-66. doi: 10.1111/cgf. 12151。
 
