@@ -15,18 +15,7 @@ https://www.ea.com/frostbite/news/moving-frostbite-to-pb
   - [x] 1 Introduction
   - [x] 2 Reference
   - [x] 3 Material
-  - [ ] 4 Lighting
-    - [x] 1
-    - [x] 2
-    - [x] 3
-    - [x] 4
-    - [x] 5
-    - [x] 6
-    - [x] 7
-    - [x] 8
-    - [x] 9
-    - [ ] 10
-    - [ ] 11
+  - [x] 4 Lighting
   - [ ] 5 Image
   - [ ] 6 PBR Transition to PBR
 

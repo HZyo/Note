@@ -1318,13 +1318,123 @@ if Alpha < 1 then
 
 ## 4.10 Shadow and occlusion
 
+### 4.10.1 Diffuse occlusion
+
+环境光的渲染方程为
+$$
+L(\mathbf{v})=\int_{\Omega} f(\mathbf{l}, \mathbf{v}) L_{a}( \mathbf{l}) V(\mathbf{l})\langle\mathbf{n} \cdot \mathbf{1}\rangle
+$$
+$L_a$ 是环境光。一个粗糙的假设是将 V 分离出积分。
+$$
+L(\mathbf{v})\approx\left[\pi \int_{\Omega} f(\mathbf{l}, \mathbf{v}) L_{a}(\mathbf{l}) \mathrm{d} \mathbf{l}\right]\left[\frac{1}{\pi} \int_{\Omega} V(\mathbf{l})\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d} \mathbf{l}\right]
+$$
+这个分离只在 $f_r(\mathbf{l},\mathbf{v})$ 和 $L_a(\mathbf{l})$ 是常数时成立（用 constant distant light 照射 Lambertian 表面）。右边的是一个 $[0,1]$ 的标量，指示一个点可达性。
+
+ambient occlusion 定义为
+$$
+A O=1-\frac{1}{\pi} \int_{\Omega} V(\mathbf{l})\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d}\mathbf{l}
+$$
+游戏中，一般将预计算结果放在 light map，cubemap 或球谐函数 spherical harmonics 中。烘焙时缺乏场景动态物体的信息。运行时可与其他信息混合。
+
+### 4.10.2 Specular occlusion
+
+ao 只是用于 Lambertian 表面，对应的是 diffuse lighting。而 specular 的遮挡很难搞定，这会导致 light leaking。
+
+> 示例
+>
+> ![1561188855724](assets/1561188855724.png)
+
+使用 ao 来直接处理 specular 是不合理的。
+
+Kozlowski[^KK07]强调，绝大多数光滑的场景都可以在一定程度上近似，而使用球谐函数的方向环境遮挡近似是最有效的方法。
+
+Gotanda[^Got13]提出了一种由 ao 导出的 specula人occlusion。Frostbite 使用了相近的方法
+
+```c++
+float computeSpecOcclusion ( float NdotV , float AO , float roughness )
+{
+    return saturate (pow( NdoV + AO , exp2 ( -16.0 f * roughness - 1.0 f)) - 1.0 f + AO);
+}
+```
+
+> 示例
+>
+> 对于 ao = 0.5 时，函数图像为
+>
+> ![1561191803953](assets/1561191803953.png)
+
+对比
+
+![1561191993995](assets/1561191993995.png)
+
+### 4.10.3 Multi resolution ambient occlusion
+
+有两类技术来生成漫反射遮蔽因子
+
+- Offline pre-computation：捕获中短程遮挡信息
+- Screen space techniques：捕获中程遮挡信息，有多种方法（HBAO，SSAO，VolumetricAO，ambient obscurance）
+
+这些方法没法解决短距遮挡。我们将遮挡分成 small，medium 和 large 三挡。
+
+Frostbite 用贴图来表达小遮挡。分成 diffuse 和 specular 两部分。
+
+- diffuse micro-occlusion：视角无关，直接将预计算结果乘进 albedo 贴图中
+
+  > 示例
+  >
+  > ![1561192569761](assets/1561192569761.png)
+  >
+  > 左 ao，中 diffuse micro-occlusion，右 albedo + diffuse micro-occlusion
+
+  
+
+- specular micro-occlusion：视角相关，使用了 Schuler 的方法[^Sch09]。
+
+  ```c++
+  f90 = saturate (50.0 * dot ( fresnel0 , 0.33) );
+  
+  float3 F_Schlick (in float3 f0 , in float f90 , in float u)
+  {
+      return f0 + ( f90 - f0) * pow (1. f - u, 5.f);
+  }
+  ```
+
+  直接将 specular micro-occlusion 可以 pre-backed 入 reflectance texture 中。
+
+  > 没看懂这种操作
+
+medium 和 large 遮挡只作用于 indirect lighting，使用了 HBAO，可以提供来自动态物体的阴影，同时提供 ao，两者取最小值。
+
+总结如下
+
+- Direct diffuse: Diffuse micro-occlusion 
+- Indirect diffuse: Diffuse micro-occlusion, min(bakedAO, HBAO)
+- Direct specular: Fresnel reflectance modification through specular micro-occlusion
+- Indirect specular: Fresnel reflectance modification through specular micro-occlusion then computeSpecularOcclusion(NdotV, min(bakedAo, HBAO), roughness)
+
+### 4.10.4 Shadows
+
+理想上，所有 lights 都应该有 shadow，但开销过大。通常依赖于 artist 来隐藏阴影的缺失。
+
+软阴影对面光源很重要
+
+![1561194092304](assets/1561194092304.png)
+
+Frostbite 只支持点和 spot light 的光照贴图，这些 shadow map 用来支持所有光照类型。为了实现 area shadows，可以将投影中心往光照方向后移，并通过 heavy blurring 和低解析度来完成。
+
+![1561194402256](assets/1561194402256.png)
+
 ## 4.11 Deferred / Forward rendering
+
+Frostbite 支持 deferred 和 forward 混合渲染。支持 tiled path 和 light culling。用一个大循环来计算所有光源来减少读取 GBuffer 的带宽消耗和增加计算精度。
 
 # 5. 图像 Image
 
 
 
 # 6. 转移到 PBR Transition to PBR
+
+
 
 # 附录 Appendix
 
@@ -1349,6 +1459,7 @@ if Alpha < 1 then
 [^Dro13]: M. Drobot. "[**Lighting of Killzone: Shadow Fall**](http://www.guerrilla-games.com/publications/)". In: Digital Dragons. 2013.
 
 [^Dro14b]: M. Drobot. "**Physically Based Area Lights**". In: GPU Pro 5. Ed. by W. Engel. CRC Press, 2014, pp. 67-100.
+[^Got13]: Y. Gotanda. "[**Real-time Physically Based Rendering**](http://research.tri-ace.com)". In: CEDEC 2013. 2013.
 
 [^Hei14]: E. Heitz. "[**Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs**](http://jcgt.org/published/0003/02/03/)". In: Journal of Computer Graphics Techniques (JCGT) 3.2 (June 2014), pp. 32-91. issn: 2331-7418.
 
@@ -1357,6 +1468,8 @@ if Alpha < 1 then
 [^Kar13]: B. Karis. "[**Real Shading in Unreal Engine 4**](http://selfshadow.com/publications/s2013-shading-course/)". In: Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses. SIGGRAPH ’13. Anaheim, California: ACM, 2013, 22:1-22:8. isbn: 978-1-4503-2339-0. doi: 10.1145/2504435.2504457.
 
 [^KC08]: J. Kˇriv´anek and M. Colbert. "[**Real-time Shading with Filtered Importance Sampling**](http://dcgi.felk.cvut.cz/publications/2008/krivanek-cgf-rts)". In: Computer Graphics Forum 27.4 (2008). Eurographics Symposium on Rendering, EGSR ’08, pp. 1147-1154. issn: 1467-8659. doi: 10.1111/j.1467-8659.2008.01252.x.
+
+[^KK07]: O. Kozlowski and J. Kautz. "[**Is Accurate Occlusion of Glossy Reflections Necessary ?**](http://web4.cs.ucl.ac.uk/staff/j.kautz/publications/glossyAPGV07.pdf)" In: Proceedings of Symposium on Applied Perception in Graphics and Visualization 2007 (July 2007), pp. 91-98.
 
 [^Koj+13]: H. Kojima, H. Sasaki, M. Suzuki, and J. Tago. "[**Photorealism Through the Eyes of a FOX: The Core of Metal Gear Solid Ground Zeroes**](http://www.gdcvault.com/play/1018086/Photorealism-Through-the-Eyes-of)". In: Game Developers Conference. 2013.
 
@@ -1372,7 +1485,9 @@ if Alpha < 1 then
 
 [^Rye]: A. Ryer. [**Light Measurement Handbook**](http://www.intl-lighttech.com/services/ilt-light-measurement-handbook). International Light Technologies Inc.
 
+[^Sch09]: C. Sch¨uler. "**An efficient and Physically Plausible Real-Time Shading Model**". In: ShaderX7: Advanced Rendering Techniques. Ed. by W. Engel. Charles River Media, 2009. Chap. 2.5.
+
 [^Ulu14]: Y. Uludag. "**Hi-Z Screen-Space Cone-Traced Reflections**". In: GPU Pro 5. Ed. by W. Engel. CRC Press, 2014, pp. 149-192.
 
-[^UFK13]: C. Ure~na, M. Fajardo, and A. King. “[**An Area-Preserving Parametrization for Spherical Rectangles**](https://www.solidangle.com/arnold/research/ )". In: Computer Graphics Forum 32.4 (2013), pp. 59-66. doi: 10.1111/cgf. 12151。
+[^UFK13]: C. Ure~na, M. Fajardo, and A. King. “[**An Area-Preserving Parametrization for Spherical Rectangles**](https://www.solidangle.com/arnold/research/ )". In: Computer Graphics Forum 32.4 (2013), pp. 59-66. doi: 10.1111/cgf. 12151.
 
