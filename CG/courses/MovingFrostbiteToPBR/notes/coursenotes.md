@@ -1568,7 +1568,19 @@ finalColor = color * exposure
 
 ### 5.1.3 Emissive and bloom effects
 
-...
+```c++
+float3 computeBloomLuminance ( float3 bloomColor ,
+float bloomEC , float currentEV )
+{
+    // currentEV is the value calculated at the previous frame
+    float bloomEV = currentEV + bloomEC ;
+    // convert to luminance
+    // See equation (12) for explanation about converting EV to luminance
+    return bloomColor * pow (2, bloomEV -3) ;
+}
+```
+
+> 没有怎么讲 bloom 的细节。。。
 
 ### 5.1.4 Sunny 16
 
@@ -1612,15 +1624,54 @@ float3 accurateLinearToSRGB (in float3 linearCol )
 
 ## 5.2 Manipulation of high values
 
-...
+HDR 存储常用的格式是 `Float32`，`Float16`，`R11F_G11F_B10F` 和 `RGB9_E5`。后两种格式无符号，`RGB9_E5` 对与 RGB 有单独的尾数位，但共享相同的指数位。
+
+各种位数的 float 对应的精度和限制为
+
+![1561221278949](assets/1561221278949.png)
+
+> Decimal digits of precision 意义不明 >_<
+
+Float formats 适合存储光照信息，因为他们是非线性的。Integer formats 也有。
+
+在 Frostbite 中
+
+- lightmap `RGB9_E5` 
+- HDRI `Float16` 
+- llight buffer `Float16`. Exposure is pre-applied. Shader 里精度是 Float32，存储时进行 exposure。
+
+
 
 ## 5.3 Antialiasing
 
-...
+PBR 增加了 aliasing，因为 NDF，强光，反射。主要原因是估计下式时 pixel 的样本缺少
+$$
+I(\mathbf{v})=\int_{\text { pixel }} L(\mathbf{v}) \mathrm{d} A
+$$
+一般情况每个像素只有一个样本。
+
+有两种主要解决技术
+
+- Supersampling
+  - MSAA multisample anti-aliasing
+  - SSAA supersample anti-aliasing
+  - TAA temporal anti-aliasing
+- Pre-Filtering
 
 # 6. 转移到 PBR Transition to PBR
 
-...
+需要同时考虑 technical 和 artistic。
+
+第一步是训练 TA。
+
+第二步是让引擎同时维持 PBR 和 non-PBR。
+
+将已存在的资源进行自动转化
+
+- 材质
+- 灯光：使用基于物理的单位很难
+
+第三步是给游戏团队安利 PBR。
 
 # 附录 Appendix
 
@@ -1635,6 +1686,99 @@ float3 accurateLinearToSRGB (in float3 linearCol )
 ## E. Rectangular area lighting 
 
 ## F. Local light probe evaluation
+
+### Sphere
+
+```c++
+float3 dominantR = getSpecularDominantDir (N, R, NdotV , roughness );
+float2 intersections;
+
+if ( sphereRayIntersect ( intersections , worldPos - spherePos , dominantR , sphereRadius ))
+{
+    // Compute the actual direction to sample , only consider far intersection
+    // No need to normalize for fetching cubemap
+    float3 localR = ( worldPos + intersections .y * dominantR ) - spherePos ;
+    
+    // We use normalized R to calc the intersection , thus intersections .y is
+    // the distance between the intersection and the receiving pixel
+    float distanceReceiverIntersection = intersections .y;
+    float distanceSphereCenterIntersection = length ( localR );
+    
+    // Compute the modified roughness based on the travelled distance
+    float localRoughness = evaluateDistanceBasedRoughness ( roughness ,
+    distanceReceiverIntersection , distanceSphereCenterIntersection );
+    
+    // Specular sampling
+    // Limit artifacts introduce with high roughness
+    localR = lerp ( localR , MainR , linearRoughness );
+    float4 result = evaluateIBLSpecular (NdotV , localR , localRoughness , f_0 , f_90 );
+    specularResult = result . rgb ;
+    specularWeight = result .a;
+    
+    // Reflection .a contains fading information for reflection data not
+    // available or barely accurate . Here we want to manage a soft
+    // transition at boundary of the sphere shape to avoid hard cutoff .
+    // Decrease the sphere radius with the influence distance for the test
+    float localDistance = length ( worldPos - spherePos );
+    float alpha = saturate (( sphereRadius - localDistance ) /
+    max ( fadeDistance , 0.0001) );
+
+    // Get local weight taking into account IBL alpha and receiver alpha
+    // Smoothstep provide a nicer transition
+    float alphaAttenuation = smoothstep ( alpha );
+    specularWeight *= alphaAttenuation ;
+}
+```
+
+### Box
+
+```c++
+float3 dominantR = getSpecularDominantDir (N, R, NdotV , roughness );
+
+// Perform Box collision to parallax correct the cubemap
+// invTransform go from worldspace to local box space without scaling
+float3 localPos = mul( float4 ( worldPos , 1) , lightInvTransform ). xyz ;
+float3 localDir = mul( dominantR , ( float3x3 ) lightInvTransform );
+
+float2 intersections = boxRayIntersect ( localPos , localDir , -lightExtend , lightExtend );
+
+// Specular contribution
+specularResult = float3 (0, 0, 0);
+specularWeight = 0;
+
+if ( intersections .y > intersections .x)
+{
+    // retrieve local intersection position ( Localized cubemap are generated in local space not world space )
+    float3 localR = localPos + intersections .y * localDir ;
+    // take into account offset (in local space ) to retrieve the correct reflection vector
+    localR = localR - light . localOffset ;
+    
+    // We use normalized R to calc the intersection , thus " intersections .y" is the distance
+    between the intersection and the receiving pixel
+    float distanceReceiverIntersection = intersections .y;
+    float distanceBoxCenterIntersection = length ( localR );
+    
+    // Compute the modified roughness based on the traveled distance
+    float localRoughness = evaluateDistanceBasedRoughness ( data . roughness , distanceReceiverIntersection , distanceBoxCenterIntersection );
+    
+    // Specular sampling
+    // Limit artifacts introduce with high roughness
+    localR = lerp ( localR , MainR , linearRoughness );
+    float4 result = evaluateIBLSpecular (NdotV , localR , localRoughness , f_0 , f_90 );
+    specularResult = result . rgb ;
+    specularWeight = result .a;
+    
+    // Reflection .a contain fading information for reflection data not available or barely accurate
+    // Here we want to manage a soft transition at boundary of the box shape to avoid hard cutoff . Do it from the boundary of the box .
+    float boxPointDistance = distanceBoxPoint ( light . influenceFadeDistance . xxx - light . extend , light . extend - light . influenceFadeDistance .xxx , localPos );
+    float alpha = 1.0 f - saturate ( boxPointDistance / max ( light . influenceFadeDistance , 0.0001) );
+    
+    // Get local weight taking into account IBL alpha and receiver alpha
+    // Smoothstep provide a nicer transition
+    float alphaAttenuation = smoothstep_ ( alpha );
+    specularWeight *= alphaAttenuation ;
+}
+```
 
 # 参考文献
 
