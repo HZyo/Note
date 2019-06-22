@@ -1430,11 +1430,197 @@ Frostbite 支持 deferred 和 forward 混合渲染。支持 tiled path 和 light
 
 # 5. 图像 Image
 
+## 5.1 A Physically Based Camera
 
+前面所有的部分都集中在光线如何在场景中以一种基于物理的方式进行交互。要获得可信的结果，另一个重要的考虑因素是考虑从场景亮度到最终像素值的整个转换链。
+
+### 5.1.1 Camera settings
+
+由于在渲染管线中我们一直处理的是 photometric units，最后到达 camera 的能量也用 luminance 表示。入射光通常覆盖了很大范围的值。因此这些值需要映射到一个标准化的像素值来生成最后的图像。
+
+![1561203907171](assets/1561203907171.png)
+
+在数字相机中，这个过程通过曝光 exposing 一段时间后在进行一些后处理 post-process。
+
+> *The purpose of this exposition is to maximize the sensor latitude by centring the current light range to halfway between white and dark (middle grey) and setting up the object of interest in the middle of the image range* 
+
+变换的完整管线如下
+
+![1561204215226](assets/1561204215226.png)
+
+- 相对孔径 relative aperture（N，单位光圈 f-stops）：控制孔径大小，影响景深
+
+- 快门时间 shutter time （t，单位秒）：控制孔径打开时间，影响运动模糊
+
+- 传感器灵敏度 sensor sensitivity/gain（S，单位 ISO）：控制光子的影响因子
+
+  > https://fotomen.cn/2018/06/25/what-ios/
+
+给定参数后，可以用 Exposure Value (EV) 整合。ISO 100 的 EV，记为 $EV_\text{100}$，有关系
+$$
+E V_{100}=\log _{2}\left(\frac{N^{2}}{t}\right)-\log _{2}\left(\frac{S}{100}\right)
+$$
+不同的参数组合可以得到相同的 EV，这使得 artist 可以在 motion blur、depth of field 和 noise 中做权衡
+
+![1561205743568](assets/1561205743568.png)
+
+> 示例
+>
+> ![1561208087769](assets/1561208087769.png)
+>
+> abc 只变化了光圈大小
+>
+> def 通过调整 ISO 使得 EV 不变
+
+除了 apeture、shutter speed 和 sensitivity，artist 还能使用曝光补偿 exposure compensation（EC，单位光圈）来 over-expose 或 under-expose 图像，通常只是曝光值的偏移
+$$
+E V_{100}^{\prime}=E V_{100}-E C
+$$
+
+> [正确掌握曝光补偿](https://fotomen.cn/2009/09/17/baoguang/) 
+
+相机可以将入射光转变成 EV。
+$$
+E V_{100}=\log _{2}\left(\frac{L_{\mathrm{avg}} S}{K}\right)
+$$
+其中 S 是 ISO，K 是 reflected-light meter calibration constant，$K=12.5$。游戏中，通常平均所有像素的 log luminance 来得到 $L_\text{avg}$（算出的值应该是 $\log_2{L_\text{avg}}$），为了稳定，可以使用 histogram 来移除过大值。
+
+### 5.1.2 Exposure
+
+EV 不同于 luminous exposure 或 photometric exposure H，描述了到达传感器的 luminance，定义为
+$$
+H=\frac{q t}{N^{2}} L
+$$
+其中 L 是 incident luminance，q 是透镜和光晕衰减 lens and vignetting attenuation（经典值为 0.65）。
+
+ISO 定义了三种关联 H 和 sensityvity 的方式
+
+- SOS: Standard Output Sensitivity
+- SBS: Saturation Based Sensitivity
+- NSB: Noise Based Sensitivity
+
+SBS 是为不会导致相机输出 clipped or bloomed 的最大可能曝光量，关系为
+$$
+H_{\mathrm{sbs}}=\frac{78}{S_{\mathrm{sbs}}}
+$$
+可推得
+$$
+\begin{aligned} H_{\mathrm{sbs}} &=\frac{78}{S} \\ \frac{q t}{N^{2}} L_{\max } &=\frac{78}{S} \\ L_{\max } &=\frac{78}{S} \frac{N^{2}}{q t} \end{aligned}
+$$
+最终的像素值可以用 $L_\text{max}$ 来标准化其 incident luminance。
+
+代码实现如下
+
+```c++
+float computeEV100 ( float aperture , float shutterTime , float ISO )
+{
+    // EV number is defined as:
+    // 2^ EV_s = N^2 / t and EV_s = EV_100 + log2 (S /100)
+    // This gives
+    // EV_s = log2 (N^2 / t)
+    // EV_100 + log2 (S /100) = log2 (N^2 / t)
+    // EV_100 = log2 (N^2 / t) - log2 (S /100)
+    // EV_100 = log2 (N^2 / t . 100 / S)
+    return log2 ( sqr ( aperture ) / shutterTime * 100 / ISO );
+}
+
+float computeEV100FromAvgLuminance ( float avgLuminance )
+{
+    // We later use the middle gray at 12.7% in order to have
+    // a middle gray at 18% with a sqrt (2) room for specular highlights
+    // But here we deal with the spot meter measuring the middle gray
+    // which is fixed at 12.5 for matching standard camera
+    // constructor settings (i.e. calibration constant K = 12.5)
+    // Reference : http :// en. wikipedia . org / wiki / Film_speed
+    return log2 ( avgLuminance * 100.0 f / 12.5 f);
+}
+
+float convertEV100ToExposure ( float EV100 )
+{
+    // Compute the maximum luminance possible with H_sbs sensitivity
+    // maxLum = 78 / ( S * q ) * N^2 / t
+    // = 78 / ( S * q ) * 2^ EV_100
+    // = 78 / (100 * 0.65) * 2^ EV_100
+    // = 1.2 * 2^ EV
+    // Reference : http :// en. wikipedia . org / wiki / Film_speed
+    float maxLuminance = 1.2 f * pow (2.0f, EV100 );
+    return 1.0 f / maxLuminance ;
+}
+
+// usage with manual settings
+float EV100 = computeEV100 ( aperture , shutterTime , ISO );
+// usage with auto settings
+float AutoEV100 = computeEV100FromAvgLuminance ( Lavg );
+
+float currentEV = useAutoExposure ? AutoEV100 : EV100 ;
+float exposure = convertEV100toExposure ( currentEV );
+
+// exposure can then be used later in the shader to scale luminance
+// if color is decomposed into XYZ
+...
+float exposedLuminance = luminance * exposure ;
+...
+// or it can be applied directly on color
+...
+finalColor = color * exposure
+...
+```
+
+### 5.1.3 Emissive and bloom effects
+
+...
+
+### 5.1.4 Sunny 16
+
+...
+
+### 5.1.5 Color space
+
+一般用 sRGB，常见的问题是用 gamma 2.2，这可以用更精确的公式代替，如代码所示
+
+```c++
+float3 approximationSRgbToLinear (in float3 sRGBCol )
+{
+    return pow ( sRGBCol , 2.2) ;
+}
+
+float3 approximationLinearToSRGB (in float3 linearCol )
+{
+    return pow ( linearCol , 1 / 2.2) ;
+}
+
+float3 accurateSRGBToLinear (in float3 sRGBCol )
+{
+    float3 linearRGBLo = sRGBCol / 12.92;
+    float3 linearRGBHi = pow (( sRGBCol + 0.055) / 1.055 , 2.4) ;
+    float3 linearRGB = ( sRGBCol <= 0.04045) ? linearRGBLo : linearRGBHi ;
+    return linearRGB ;
+}
+
+float3 accurateLinearToSRGB (in float3 linearCol )
+{
+    float3 sRGBLo = linearCol * 12.92;
+    float3 sRGBHi = ( pow( abs ( linearCol ), 1.0/2.4) * 1.055) - 0.055;
+    float3 sRGB = ( linearCol <= 0.0031308) ? sRGBLo : sRGBHi ;
+    return sRGB ;
+}
+```
+
+对比如下
+
+![1561212121316](assets/1561212121316.png)
+
+## 5.2 Manipulation of high values
+
+...
+
+## 5.3 Antialiasing
+
+...
 
 # 6. 转移到 PBR Transition to PBR
 
-
+...
 
 # 附录 Appendix
 
