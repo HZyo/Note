@@ -23,8 +23,8 @@ https://www.ea.com/frostbite/news/moving-frostbite-to-pb
     - [x] 5
     - [x] 6
     - [x] 7
-    - [ ] 8
-    - [ ] 9
+    - [x] 8
+    - [x] 9
     - [ ] 10
     - [ ] 11
   - [ ] 5 Image

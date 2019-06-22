@@ -100,7 +100,7 @@ $$
 $$
 f_{d}(\mathbf{v})=\frac{\rho}{\pi} \frac{1}{|\mathbf{n} \cdot \mathbf{v}||\mathbf{n} \cdot 1|} \int_{\Omega} G(\mathbf{v}, 1, \mathbf{m}) D(\mathbf{m}, \alpha)\langle\mathbf{v} \cdot \mathbf{m}\rangle\langle\mathbf{1} \cdot \mathbf{m}\rangle \mathrm{d} \mathbf{m}
 $$
-往常 $f_d​$ 被视为简单的 Lambertian 模型，然而 diffuse 部分应该与 specular 一致，并且考虑 `roughness`[^Bur12]。上式没有解析解，Burley[^Bur12] 给出了经验公式，考虑了 `roughness` 并且在 grazing angles 处有回射 retro-reflection
+往常 $f_d$ 被视为简单的 Lambertian 模型，然而 diffuse 部分应该与 specular 一致，并且考虑 `roughness`[^Bur12]。上式没有解析解，Burley[^Bur12] 给出了经验公式，考虑了 `roughness` 并且在 grazing angles 处有回射 retro-reflection
 $$
 \begin{aligned}
 
@@ -111,7 +111,7 @@ F_{D 90}&=0.5+\cos \left(\theta_{d}\right)^{2} \alpha\\
 \end{aligned}
 $$
 
-> $\theta_d​$ 不知道指什么
+> $\theta_d$ 不知道指什么
 
 ### 3.1.3 能量守恒 Energy conservation
 
@@ -230,13 +230,13 @@ Disney base material 使用下列参数
 - BaseColor
 
   - non-metallic: diffuse albedo
-  - metallic: $F_0​$ 
+  - metallic: $F_0$ 
 
-- Smoothness: $\text{smoothness}=1-\alpha_\text{lin}​$ 
+- Smoothness: $\text{smoothness}=1-\alpha_\text{lin}$ 
 
 - MetalMask: metalness, mask 用于暗示 artist 这个值是 binary
 
-- Reflectance: $F_0=0.16\ \text{reflectance}^2​$ 
+- Reflectance: $F_0=0.16\ \text{reflectance}^2$ 
 
   ![1560930607656](assets/1560930607656.png)
 
@@ -851,7 +851,7 @@ $$
 
 这个近似对小的立体角有效，上式通过仔细选择 $\mathbf{l}$ 可以使其扩展到大立体角情形，该点成为 Most Representative Point (MRP)。
 
-retangle 立体角的计算有解析解[^UFK13]，但没有考虑 horizon handling。出于性能考虑，对 $\Omega_\text{light}​$ 的估计不考虑 horizon handling，直接计算直角椎体的立体角 rihgt pyramid solid angle[^Pla]。
+retangle 立体角的计算有解析解[^UFK13]，但没有考虑 horizon handling。出于性能考虑，对 $\Omega_\text{light}$ 的估计不考虑 horizon handling，直接计算直角椎体的立体角 rihgt pyramid solid angle[^Pla]。
 
 ```c++
 1 float rightPyramidSolidAngle ( float dist , float halfWidth , float halfHeight )
@@ -1048,7 +1048,273 @@ float3 getSpecularDominantDirArea ( float3 N, float3 R, float NdotV , float roug
 
 ## 4.8 Emissive surfaces
 
+在 Frostbite 中，emissive lights 用来显示光源表面，面光源用来发光。
+
+emissive light 在着色器中以像素精度生成，需要提供发光颜色和发光强度值，不发光，只是用于显示颜色。可以产生 blooming。
+
+有三种 emissive surface
+
+![1561021638831](assets/1561021638831.png)
+
+在 Frostbite 中支持 case B，并隐式支持 case C。
+
+渲染方法有四种
+
+- Transparent objects: Emissive applied during the rendering of the surface. 
+- Forward opaque objects: Emissive applied during the rendering of the surface.
+- Deferred lit opaque objects with full emissive: Emissive applied in an extra rendering pass of the surface: the surface is rendered twice.
+- Deferred lit opaque objects with cheap emissive: Emissive stored in the radiosity buffer, and applied at the same time as the indirect lighting.
+
+引擎自动给光源生产了 emissive shape
+
+![1561023115315](assets/1561023115315.png)
+
 ## 4.9 Image besed lights
+
+IBL 使得我们可以表示一个点的入射光。这个光源会影响 BRDF 的 diffuse 和 specular。
+
+需要计算光照积分
+$$
+L(\mathbf{v})=\int_{\Omega} f(\mathbf{l}, \mathbf{v}, \Theta) L(\math bf{l}) \mathrm{d} \mathbf{l}
+$$
+其中 $\Theta$ 指 Fresnel、`roughness`、`albedo` 等等。
+
+我们使用了四种类型的 IBL[^Dro13] 
+
+- Distant light probe: parallax-free far lighting, least accurate
+- Local light probes: local lighting with parallax, cubemap
+- Screen-space reflections: close-range lighting (supporting glossy reflection), ray  marching
+- Planar reflections: an alternative to SSR, rendering the scene mirrored by a plane
+
+static vs. dynamic：Distant 和 local light probes 是 static 的。他们的内容可以根据需求进行更新。SSR 和 planar reflection 包含了动态光照信息，他们每一帧都更新，因为他们与视角相关，计算可以分摊在多帧中。
+
+### 4.9.1 Light probes acquisition and unit
+
+IBL 与 image 关联
+
+#### 4.9.1.1 Distant light probe
+
+distant light probes 捕获了周围环境，表示成 cubemap。artists 有两种方式获取 distant light probe：
+
+- 用基于物理的天空
+- 用真实世界的相机捕获 High Dynamic Range Image HDRI
+
+Frostbite 使用了基于物理的天空，可按需求更新（时间、天气变化）。
+
+HDRI 中应移除强光源，以减少预积分的噪声和处理他们的可见性，如太阳。
+
+#### 4.9.1.2 Local light probes
+
+local light probe 在有限区域内捕获周围物体，可根据需求进行更新。
+
+有几个渲染问题
+
+- order-dependency：local light probe 应在渲染场景前完成处理
+- metallic surface：金属表面是病态的因为他们没有 difuse 且在捕获期没有 specular。我们可以多次捕获 local light probe 来模拟 light bounces。或者依赖于 distant light probe，然而不适用于室内环境。
+- view-dependent effects：local light probe 在某点进行捕获，glossy 和 mirror-like 表面的入射光对于视点来说不适用。
+
+为了解决这些问题，为了解决这个问题，捕获时不考虑 specular。对于金属表面，他们近似成漫反射表面，用 $F_0$ 来作为 albedo。捕获时同时保存了可见性，存储在 alpha 通道中。
+
+> 示例
+>
+> ![1561111432388](assets/1561111432388.png)
+
+### 4.9.2 Light probe filtering
+
+此部分的内容大多同于我之前写的文章 [深入理解 PBR/基于图像的照片 IBL](https://zhuanlan.zhihu.com/p/66518450)，不再赘述。
+
+有一些不同之处或细节之处
+
+- LD 项用 cos weighted hemisphere 采样
+
+- LUT 的大小 128 * 128 足够了
+
+- pre-filter environment map 256 * 256 或 512 * 512
+
+- Disney diffuse 分成了 DFG 和 LD 项
+
+- mipmap 不是 roughness 的线性形式，而是
+
+  $$
+  \text{mipLevel}=\sqrt{\alpha_{\text { lin }}}\text{mipCount}
+  $$
+
+### 4.9.3 Light probe evaluation
+
+diffuse 和 specular 的 pre-integrations 都是 view-independent，而 diffuse 和 specular 是 view dependent。这意味着他们的 lobe direction 依赖于视线方向。对于 specular，我们计算 BRDF 时使用 principal direction 而不是 mirror reflection 来获取 pre-integrated 值。
+
+highest value direction 依赖于视角和粗糙度。我们提出的模型不能正确捕获电介质在低视角的表现。这是因为实际的 lobe 只浮出了一点点，但因为 Fresnel 随视角增加较慢，因此影响不大。
+
+```c++
+// This is an accurate fitting of the specular peak ,
+// but due to other approximation in our decomposition it doesn ’t perform well
+float3 getSpecularDominantDir ( float3 N, float3 R, float NdotV , float roughness )
+{
+#if GSMITH_CORRELATED
+    float lerpFactor = pow (1 - NdotV , 10.8649) * (1 - 0.298475 * log (39.4115 - 39.0029 *
+        roughness )) + 0.298475 * log (39.4115 - 39.0029 * roughness );
+# else
+    float lerpFactor = 0.298475 f * NdotV * log (39.4115 f - 39.0029 f * roughness ) + (0.385503 f -
+        .385503 f * NdotV ) * log (13.1567 f - 12.2848 f * roughness );
+# endif
+
+    // The result is not normalized as we fetch in a cubemap
+    return lerp (N, R, lerpFactor );
+}
+```
+
+用一个简单的近似效果更好
+
+```c++
+// We have a better approximation of the off specular peak
+// but due to the other approximations we found this one performs better .
+// N is the normal direction
+// R is the mirror vector
+// This approximation works fine for G smith correlated and uncorrelated
+float3 getSpecularDominantDir ( float3 N, float3 R, float roughness )
+{
+    float smoothness = saturate (1 - roughness );
+    float lerpFactor = smoothness * ( sqrt ( smoothness ) + roughness );
+    // The result is not normalized as we fetch in a cubemap
+    return lerp (N, R, lerpFactor );
+}
+```
+
+比较结果如下
+
+![1561172589487](assets/1561172589487.png)
+
+可见高粗糙度下，mirror direction 误差较大。
+
+对于 Disney diffuse，dominant direction 依赖于视线方向。一个简单的线性模型就能相对准确地捕获这种行为。
+
+```c++
+// N is the normal direction
+// V is the view vector
+// NdotV is the cosine angle between the view vector and the normal
+float3 getDiffuseDominantDir ( float3 N, float3 V, float NdotV , float roughness )
+{
+    float a = 1.02341 f * roughness - 1.51174 f;
+    float b = -0.511705 f * roughness + 0.755868 f;
+    lerpFactor = saturate (( NdotV * a + b) * roughness );
+    // The result is not normalized as we fetch in a cubemap
+    return lerp (N, V, lerpFactor );
+}
+```
+
+对于 distant Light，diffuse 和 specular 的计算如下
+
+```c++
+float3 evaluateIBLDiffuse (...)
+{
+    float3 dominantN = getDiffuseDominantDir (N, V, NdotV , roughness );
+    float3 diffuseLighting = diffuseLD . Sample ( sampler , dominantN );
+
+    float diffF = DFG . SampleLevel ( sampler , float2 (NdotV , roughness ), 0).z;
+
+    return diffuseLighting * diffF ;
+}
+
+float3 evaluateIBLSpecular (...)
+{
+    float3 dominantR = getSpecularDominantDir (N, R, NdotV , roughness );
+    
+    // Rebuild the function
+    // L . D. ( f0.Gv .(1 - Fc) + Gv.Fc ) . cosTheta / (4 . NdotL . NdotV )
+    NdotV = max (NdotV , 0.5 f/ DFG_TEXTURE_SIZE );
+    float mipLevel = linearRoughnessToMipLevel ( linearRoughness , mipCount );
+    float3 preLD = specularLD . SampleLevel ( sampler , dominantR , mipLevel ). rgb ;
+    
+    // Sample pre - integrate DFG
+    // Fc = (1-H.L)^5
+    // PreIntegratedDFG .r = Gv .(1 - Fc)
+    // PreIntegratedDFG .g = Gv.Fc
+    float2 preDFG = DFG . SampleLevel ( sampler , float2 (NdotV , roughness ), 0).xy;
+
+    // LD . ( f0.Gv .(1 - Fc) + Gv.Fc. f90 )
+    return preLD * (f0 * preDFG .x + f90 * preDFG .y);
+}
+```
+
+修改后的 Disney diffuse BRDF 保证了能量守恒。
+
+未来考虑周围环境的视差，local light probe需要使用代理几何体来重投影光照信息。Frostbite 支持 sphere 和 oriented box，由 artist 手动放置。运行时，在 locla light probe 内的物体会计算采样方向与 proxy geometry 的交点，然后用校正的方向来进行 local light probe 的相关计算[^LZ12]。对于高粗糙度情形，这种校正会产生 artifact，我们用 roughness 在校正方向与原方向之间插值。此外还可以移动 cubemap 的中心。
+
+local light probe 只用于 specular 部分，详见 [Appendix F. Local light probe evaluation](#F. Local light probe evaluation)。对于漫反射项，光照信息来自于 light map 或 probe voulumes，用 retro-reflective lobe 的 dominant direction。
+
+BRDF lobe 描述了入射光的积分情况，会使得 BRDF 的 footprint  与距离相关。如果物体离着色点近时，反射的该物体会较为清晰，否则会模糊。
+
+![1561178724148](assets/1561178724148.png)
+
+> 示例
+>
+> ![1561178735756](assets/1561178735756.png)
+
+local light probe proxy geometry 允许我们计算入射光与着色点的距离，以此大概估计 BRDF 的 footprint，并在估计中考虑了 roughness，称为 "distance based roughness"
+$$
+\alpha'=\frac{\text{distanceInteresectionToShadedPoint}}{\text{distanceInteresectionToProbeCenter}}\alpha
+$$
+这是一个很粗糙的估计，并且只对地粗糙度情形合理，对高粗糙度不合理，因此最后还对两者用粗糙度做线性插值。
+
+```c++
+float computeDistanceBaseRoughness (
+    float distInteresectionToShadedPoint ,
+    float distInteresectionToProbeCenter ,
+    float linearRoughness )
+{
+    // To avoid artifacts we clamp to the original linearRoughness
+    // which introduces an acceptable bias and allows conservation
+    // of mirror reflection behavior for a smooth surface .
+    float newLinearRoughness = clamp ( distInteresectionToShadedPoint /
+    distInteresectionToProbeCenter * linearRoughness , 0, linearRoughness );
+    return lerp ( newLinearRoughness , linearRoughness , linearRoughness );
+}
+```
+
+当 SSR 失败时才会使用 local light probe。
+
+### 4.9.4 Screen space reflections
+
+SSR 能捕获接近中距（短距）的反射并且对小物体/小细节很重要。我们的技术依赖于建立在场景深度缓冲区之上的分层 z （Hierarchical-Z，Hi-Z）结构，可以快速追踪长光线，尽可能使用屏幕信息，称为 "Hi-Z Screen-Space Cone-Traced Reflections"[^Ulu14]。
+
+emissive 只是视觉的，而 SSR 会将其考虑进去，因此相当于计算了两次光照，没法简单解决这个问题。
+
+### 4.9.5 Image based lights composition
+
+每种 IBL 类型代表不同的入射光，并且有各自的限制。为了能够让一个对象不断地适应它的环境，我们以分层的方式组合了所有这些 IBL。
+
+SSR 是很好的获取正确反射的方式，但由于屏幕空间的限制，其经常失败。当 SSR 失败后，就用 local light probe。local light probes 根据层级来计算，从小至大，直到得到反射信息，否则用 distant light probe。
+
+``` pascal
+// Short range reflections
+Evaluate SSR
+RGB = SSR.rgb
+Alpha = SSR.a
+// Medium range reflections
+while local light probes and Alpha < 1 do
+    Evaluate local light probe
+    a = saturate(localLightProbe.a - Alpha)
+    RGB += localLightProbe.rgb * a
+    Alpha = saturate(a + Alpha)
+// Large range reflections
+if Alpha < 1 then
+    Evaluate distant light probe
+    RGB += distantLightProbe.rgb * (1-Alpha)
+```
+
+如果 local light probe 对应像素有物体的话，则 alpha 为 1。
+
+> 示例
+>
+> ![1561185593601](assets/1561185593601.png)
+>
+> 光线 1 可从绿 local light probe 中得 alpha 为 1，停止
+>
+> 光线 2 可从绿 local light probe 中得 alpha 为 0，因此继续在红 local light probe 中得 为 1，停止
+>
+> 光线 2 可从绿 local light probe 中得 alpha 为 0，因此继续在红 local light probe 中得 为 0，因此使用 distant light probe
+
+此外还有 planar reflection，作为 SSR 的替代。（原文没有详细叙述）
 
 ## 4.10 Shadow and occlusion
 
@@ -1060,7 +1326,19 @@ float3 getSpecularDominantDirArea ( float3 N, float3 R, float NdotV , float roug
 
 # 6. 转移到 PBR Transition to PBR
 
+# 附录 Appendix
 
+## A. Listing for reference mode 
+
+## B. Oren-Nayar and GGX’s diffuse term derivation 
+
+## C. Energy conservation
+
+## D. Optimization algorithm for converting to Disney’s parametrization
+
+## E. Rectangular area lighting 
+
+## F. Local light probe evaluation
 
 # 参考文献
 
@@ -1078,9 +1356,13 @@ float3 getSpecularDominantDirArea ( float3 N, float3 R, float NdotV , float roug
 
 [^Kar13]: B. Karis. "[**Real Shading in Unreal Engine 4**](http://selfshadow.com/publications/s2013-shading-course/)". In: Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses. SIGGRAPH ’13. Anaheim, California: ACM, 2013, 22:1-22:8. isbn: 978-1-4503-2339-0. doi: 10.1145/2504435.2504457.
 
+[^KC08]: J. Kˇriv´anek and M. Colbert. "[**Real-time Shading with Filtered Importance Sampling**](http://dcgi.felk.cvut.cz/publications/2008/krivanek-cgf-rts)". In: Computer Graphics Forum 27.4 (2008). Eurographics Symposium on Rendering, EGSR ’08, pp. 1147-1154. issn: 1467-8659. doi: 10.1111/j.1467-8659.2008.01252.x.
+
 [^Koj+13]: H. Kojima, H. Sasaki, M. Suzuki, and J. Tago. "[**Photorealism Through the Eyes of a FOX: The Core of Metal Gear Solid Ground Zeroes**](http://www.gdcvault.com/play/1018086/Photorealism-Through-the-Eyes-of)". In: Game Developers Conference. 2013.
 
 [^LH13]: S. Lagarde and L. Harduin. "[**The Art and Rendering of Remember Me**](http://seblagarde.wordpress.com/2013/08/22/gdceurope-2013-talk-the-art-and-rendering-of-remember-me/)". In: Game Developers Conference Europe. 2013.
+
+[^LZ12]: S. Lagarde and A. Zanuttini. "[**Local Image-based Lighting with Parallax-corrected Cubemaps**](http://seblagarde.wordpress.com/2012/11/28/siggraph-2012-talk/)". In: ACM SIGGRAPH 2012 Talks. SIGGRAPH ’12. Los Angeles, California: ACM, 2012, 36:1-36:1. isbn: 978-1-4503-1683-5. doi: 10.1145/2343045.2343094.
 
 [^Mar14]: I. Mart´ınez. [**Radiative view factors**](http://webserver.dmt.upm.es/~isidoro/tc3/Radiation%5C%20View%5C%20factors.pdf). 1995-2014.
 
@@ -1089,6 +1371,8 @@ float3 getSpecularDominantDirArea ( float3 N, float3 R, float NdotV , float roug
 [^Qui06]: I. Qu´ılez. [**Sphere ambient occlusion**](http://www.iquilezles.org/www/artiles/sphereao/sphereao.htm). 2006.
 
 [^Rye]: A. Ryer. [**Light Measurement Handbook**](http://www.intl-lighttech.com/services/ilt-light-measurement-handbook). International Light Technologies Inc.
+
+[^Ulu14]: Y. Uludag. "**Hi-Z Screen-Space Cone-Traced Reflections**". In: GPU Pro 5. Ed. by W. Engel. CRC Press, 2014, pp. 149-192.
 
 [^UFK13]: C. Ure~na, M. Fajardo, and A. King. “[**An Area-Preserving Parametrization for Spherical Rectangles**](https://www.solidangle.com/arnold/research/ )". In: Computer Graphics Forum 32.4 (2013), pp. 59-66. doi: 10.1111/cgf. 12151。
 
