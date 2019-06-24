@@ -1388,7 +1388,7 @@ Frostbite 用贴图来表达小遮挡。分成 diffuse 和 specular 两部分。
 
   
 
-- specular micro-occlusion：视角相关，使用了 Schuler 的方法[^Sch09]。
+- specular micro-occlusion：视角相关，使用了 Schuler 的方法[^Sch09]。利用了 $F_0>0.02$ 的事实来实现减少菲尼尔反射。
 
   ```c++
   f90 = saturate (50.0 * dot ( fresnel0 , 0.33) );
@@ -1399,9 +1399,9 @@ Frostbite 用贴图来表达小遮挡。分成 diffuse 和 specular 两部分。
   }
   ```
 
-  直接将 specular micro-occlusion 可以 pre-backed 入 reflectance texture 中。
+  直接将 specular micro-occlusion 可以 pre-baked 入 reflectance texture 中。
 
-  > 没看懂这种操作
+  > 因为修改 $F_0$ 意味着修改了材质的性质。所以用额外的 G-Buffer 来存储相关信息，但开销大提升小，不值。
 
 medium 和 large 遮挡只作用于 indirect lighting，使用了 HBAO，可以提供来自动态物体的阴影，同时提供 ao，两者取最小值。
 

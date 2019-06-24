@@ -18,9 +18,6 @@ f-number 越大，孔径越小，图像越暗。2 倍 f-number，则亮度变为
 
 ![320px-Aperture_diagram.svg](assets/320px-Aperture_diagram.svg.jpg)
 
-Sunny 16 rule
-An example of the use of f-numbers in photography is the sunny 16 rule: an approximately correct exposure will be obtained on a sunny day by using an aperture of f/16 and the shutter speed closest to the reciprocal of the ISO speed of the film; for example, using ISO 200 film, an aperture of f/16 and a shutter speed of 1⁄200 second. The f-number may then be adjusted downwards for situations with lower light. Selecting a lower f-number is "opening up" the lens. Selecting a higher f-number is "closing" or "stopping down" the lens.
-
 # exposure
 
 https://en.wikipedia.org/wiki/Exposure_(photography)
