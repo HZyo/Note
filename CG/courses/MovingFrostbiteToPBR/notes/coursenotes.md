@@ -65,11 +65,11 @@ BSDF 模型可分为反射部分 BRDF 和透射部分 BTDF。本文只关注反�
 
 ![1560924923148](assets/1560924923148.jpg)
 
-一个平坦的表面可以用菲涅尔定律来表示，对于不平坦的表面，可以使用微平面模型。
+一个平坦的表面可以用菲涅尔定律来表示，对于不平坦的表面，可以使用**微平面模型**。
 
 ![1560925155675](assets/1560925155675.jpg)
 
-一个微平面模型如下[^Hei14]
+一个微平面模型如下[^Hei14] 
 $$
 f_{d / r}(\mathbf{v})=\frac{1}{|\mathbf{n} \cdot \mathbf{v}||\mathbf{n} \cdot \mathbf{1}|} \int_{\Omega} f_{m}(\mathbf{v}, \mathbf{1}, \mathbf{m}) G(\mathbf{v}, \mathbf{l}, \mathbf{m}) D(\mathbf{m}, \alpha)\langle\mathbf{v} \cdot \mathbf{m}\rangle\langle\mathbf{l} \cdot \mathbf{m}\rangle \mathrm{d} \mathbf{m}
 $$
@@ -80,7 +80,7 @@ $$
 $$
 f_{r}(\mathbf{v})=\frac{F\left(\mathbf{v}, \mathbf{h}, f_{0}, f_{90}\right) G(\mathbf{v}, 1, \mathbf{h}) D(\mathbf{h}, \alpha)}{4\langle\mathbf{n} \cdot \mathbf{v}\rangle\langle\mathbf{n} \cdot \mathbf{l}\rangle}
 $$
-Heirz[^Hei14]指出应使用正确的 G 项，很多文献使用 Smith 近似，然而更精确的形式考虑了遮蔽和阴影的相干性，如下
+Heirz[^Hei14]指出应使用正确的 G 项，很多文献使用 Smith 近似，然而更精确的形式考虑了**遮蔽和阴影的相干性**，如下
 $$
 \begin{aligned}
 
@@ -117,7 +117,7 @@ $$
 
 能量守恒要求
 $$
-\rho_{h d}(\mathbf{v})=\int_{\Omega} f(\mathbf{v}, 1)\langle\mathbf{n} \cdot \mathbf{1}\rangle \mathrm{dl}=\int_{\Omega}\left(f_{r}(\mathbf{v}, \mathbf{l})+f_{d}(\mathbf{v}, \mathbf{l})\right)\langle\mathbf{n} \cdot 1\rangle \mathrm{d} \mathbf{l} \leq 1
+\rho_{h d}(\mathbf{v})=\int_{\Omega} f(\mathbf{v}, \mathbf{l})\langle\mathbf{n} \cdot \mathbf{l}\rangle \mathrm{d}\mathbf{l}=\int_{\Omega}\left(f_{r}(\mathbf{v}, \mathbf{l})+f_{d}(\mathbf{v}, \mathbf{l})\right)\langle\mathbf{n} \cdot 1\rangle \mathrm{d} \mathbf{l} \leq 1
 $$
 Disney diffuse 不是能量守恒的。
 
@@ -147,7 +147,7 @@ specular 有两个容易被忽视但有重要影响的现象
 
 - Half-angle parametrization：BRDF形状发生非线性变换，即从正常入射角的各向同性向掠射角的各向异性转变，详见[4.9 节](#4.9)。
 
-- Off-specular：经常假设 BRDF 的 lobe 中心在反射方向附近，然而由于 $\langle\mathbf{n} \cdot 1\rangle$ 和 G，当 `roughness` 增大时，BRDF 的 lobe 会朝向法向偏移，称为 Off-specular peak。lobe 的中心方向称为 dominant direction
+- Off-specular：经常假设 BRDF 的 lobe 中心在反射方向附近，然而由于 $\langle\mathbf{n} \cdot \mathbf{l}\rangle$ 和 G，当 `roughness` 增大时，BRDF 的 lobe 会朝向法向偏移，称为 Off-specular peak。lobe 的中心方向称为 dominant direction
 
   ![1560928607758](assets/1560928607758.jpg)
 
@@ -1448,11 +1448,17 @@ Frostbite 支持 deferred 和 forward 混合渲染。支持 tiled path 和 light
 
 ![1561204215226](assets/1561204215226.jpg)
 
-- 相对孔径 relative aperture（N，单位光圈 f-stops）：控制孔径大小，影响景深
+> CCD 是电荷耦合器件 Charge Coupled Device，将光信号转换为模拟信号
+>
+> ADC 是模拟数字转换器 Analog to Digital Converter，将模拟信号转换为数字信号
+>
+> remapping 包括 white balancing、color grading、tone mapping、gamma correction
 
-- 快门时间 shutter time （t，单位秒）：控制孔径打开时间，影响运动模糊
+- 相对孔径 relative aperture（N，单位光圈 f-stops/f-number）：控制孔径大小，影响景深，焦距比光圈
 
-- 传感器灵敏度 sensor sensitivity/gain（S，单位 ISO）：控制光子的影响因子
+- 曝光时间 exposure time / shutter speed（t，单位秒）：控制孔径打开时间，影响运动模糊
+
+- 传感器灵敏度 sensor sensitivity / gain（S，单位 ISO）：控制光子的影响因子
 
   > https://fotomen.cn/2018/06/25/what-ios/
 
@@ -1460,6 +1466,10 @@ Frostbite 支持 deferred 和 forward 混合渲染。支持 tiled path 和 light
 $$
 E V_{100}=\log _{2}\left(\frac{N^{2}}{t}\right)-\log _{2}\left(\frac{S}{100}\right)
 $$
+> $$
+> EV_S=EV_\text{100}+\log_2\frac{S}{100}
+> $$
+
 不同的参数组合可以得到相同的 EV，这使得 artist 可以在 motion blur、depth of field 和 noise 中做权衡
 
 ![1561205743568](assets/1561205743568.jpg)
@@ -1485,11 +1495,25 @@ E V_{100}=\log _{2}\left(\frac{L_{\mathrm{avg}} S}{K}\right)
 $$
 其中 S 是 ISO，K 是 reflected-light meter calibration constant，$K=12.5$。游戏中，通常平均所有像素的 log luminance 来得到 $L_\text{avg}$（算出的值应该是 $\log_2{L_\text{avg}}$），为了稳定，可以使用 histogram 来移除过大值。
 
+> 将数值代入可化简上式
+> $$
+> EV_\text{100}=\log_2 L_\text{avg} + 3
+> $$
+> 因此有
+> $$
+> L_\text{avg}=2^{EV_{100}-3}
+> $$
+>
+> 泛化的公式应该是
+> $$
+> EV=\log_2\frac{L_\text{avg}S}{K}
+> $$
+
 ### 5.1.2 Exposure
 
 EV 不同于 luminous exposure 或 photometric exposure H，描述了到达传感器的 luminance，定义为
 $$
-H=\frac{q t}{N^{2}} L
+H=\frac{q t}{N^{2}} L=Et
 $$
 其中 L 是 incident luminance，q 是透镜和光晕衰减 lens and vignetting attenuation（经典值为 0.65）。
 
@@ -1531,10 +1555,11 @@ float computeEV100FromAvgLuminance ( float avgLuminance )
     // But here we deal with the spot meter measuring the middle gray
     // which is fixed at 12.5 for matching standard camera
     // constructor settings (i.e. calibration constant K = 12.5)
-    // Reference : http :// en. wikipedia . org / wiki / Film_speed
+    // Reference : http://en.wikipedia.org/wiki/Film_speed
     return log2 ( avgLuminance * 100.0 f / 12.5 f);
 }
 
+// 这里 Exposure 不准确，应该是 1 / maxLuminance
 float convertEV100ToExposure ( float EV100 )
 {
     // Compute the maximum luminance possible with H_sbs sensitivity
@@ -1542,7 +1567,7 @@ float convertEV100ToExposure ( float EV100 )
     // = 78 / ( S * q ) * 2^ EV_100
     // = 78 / (100 * 0.65) * 2^ EV_100
     // = 1.2 * 2^ EV
-    // Reference : http :// en. wikipedia . org / wiki / Film_speed
+    // Reference : http://en.wikipedia.org/wiki/Film_speed
     float maxLuminance = 1.2 f * pow (2.0f, EV100 );
     return 1.0 f / maxLuminance ;
 }
@@ -1553,7 +1578,7 @@ float EV100 = computeEV100 ( aperture , shutterTime , ISO );
 float AutoEV100 = computeEV100FromAvgLuminance ( Lavg );
 
 float currentEV = useAutoExposure ? AutoEV100 : EV100 ;
-float exposure = convertEV100toExposure ( currentEV );
+float exposure = convertEV100toExposure ( currentEV ); // 1 / maxLuminance
 
 // exposure can then be used later in the shader to scale luminance
 // if color is decomposed into XYZ
@@ -1584,7 +1609,9 @@ float bloomEC , float currentEV )
 
 ### 5.1.4 Sunny 16
 
-...
+使用 [sunny 16 rule](photography.md) 来验证计算
+
+![1561343092247](assets/1561343092247.png)
 
 ### 5.1.5 Color space
 
@@ -1624,7 +1651,7 @@ float3 accurateLinearToSRGB (in float3 linearCol )
 
 ## 5.2 Manipulation of high values
 
-HDR 存储常用的格式是 `Float32`，`Float16`，`R11F_G11F_B10F` 和 `RGB9_E5`。后两种格式无符号，`RGB9_E5` 对与 RGB 有单独的尾数位，但共享相同的指数位。
+HDR 存储常用的格式是 `Float32`，`Float16`，`R11F_G11F_B10F` 和 `RGB9_E5`。后两种格式无符号，`RGB9_E5` 对于 RGB 有单独的尾数位，但共享相同的指数位。
 
 各种位数的 float 对应的精度和限制为
 

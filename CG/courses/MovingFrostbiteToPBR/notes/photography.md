@@ -157,7 +157,12 @@ $$
 > $$
 > EV_\text{400}=EV_\text{100}+\log_2\frac{400}{100}=EV_\text{100}+2
 > $$
-> 对于 night sports，查表得 9，则 $EV_\text{400}=2$。
+> 对于 night sports，查表得 9，则 $EV_\text{400}=11$。
+
+简单等式变换后得 s
+$$
+EV_\text{100}=EV_S-\log_2\frac{S}{100}=\log_2\frac{N^2}{t}-\log_2\frac{S}{100}
+$$
 
 # Sunny 16 rule
 
