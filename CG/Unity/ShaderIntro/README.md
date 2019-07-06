@@ -16,7 +16,7 @@
 - [ ] 基础
   - [x] [01 欢迎来到 Shader 的世界](notes\01_Intro.md) 
   - [x] [02 渲染流水线](notes\02_Pipeline,md) 
-  - [ ] [03 Unity Shader 基础](notes\03_ShaderBasic.md) 
+  - [x] [03 Unity Shader 基础](notes\03_ShaderBasic.md) 
   - [ ] [04 学习 Shader 所需的数学基础](notes\04_MathBasic.md) 
 - [ ] 初级
   - [ ] [05 开始 Unity Shader 学习之旅](notes\05_Start.md) 
