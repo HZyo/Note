@@ -1,7 +1,7 @@
 # CG
 
 - [blogs](blogs/) 
-- [cources](cources/) 
+- [courses](courses/) 
 - [papers](papers) 
 - [PBRT](PBRT) 
 - [RTR4](RTR4) 
