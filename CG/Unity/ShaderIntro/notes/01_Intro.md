@@ -1,4 +1,4 @@
-# 第一章 欢迎来到 Shader 的世界
+# 第 1 章  欢迎来到 Shader 的世界
 
 ## 1.1 程序员的三大浪漫
 
@@ -9,7 +9,7 @@
 ## 1.2 本书结构
 
 - 基础（没有代码）
-  - [02 渲染流水线](02_Pipeline,md) 
+  - [02 渲染流水线](02_Pipeline.md) 
   - [03 Unity Shader 基础](03_ShaderBasic.md) 
   - [04 学习 Shader 所需的数学基础](04_MathBasic.md) 
 - 初级
