@@ -1,5 +1,6 @@
 # CG
 
+- [blogs](blogs/) 
 - [cources](cources/) 
 - [papers](papers) 
 - [PBRT](PBRT) 

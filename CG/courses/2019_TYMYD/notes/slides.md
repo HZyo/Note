@@ -25,7 +25,7 @@
 
 [Artist-Directable Real-Time Rain Rendering in City Environments](https://dl.acm.org/citation.cfm?id=1185828) 
 
-### 微软 | 双锥雨
+### 微软 | 双锥雨[^04 Wang][^12 Lagarde]
 
 - **世界空间中，跟随相机移动的椎体，在椎体上做纹理动画** 
 
@@ -81,4 +81,10 @@
 ## 月、星、银河
 
 # 昼夜天气变换
+
+# 参考
+
+[^04 Wang]: Wang N, Wade B. [**Rendering falling rain and snow**](https://dl.acm.org/citation.cfm?id=1186241)[C]//ACM SIGGRAPH 2004 Sketches. ACM, 2004: 14.
+
+[^12 Lagarde]: Sébastien Lagarde. [**Water Drop**](https://seblagarde.wordpress.com/2012/12/10/observe-rainy-world/). 2012.
 
