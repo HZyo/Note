@@ -23,7 +23,7 @@
   - [ ] [04 学习 Shader 所需的数学基础](notes/04_MathBasic.md) 
 - [ ] 初级
   - [x] [05 开始 Unity Shader 学习之旅](notes/05_Start.md) 
-  - [ ] [06 Untiy 中的基础光照](notes/06_LightingBasic.md) 
+  - [x] [06 Untiy 中的基础光照](notes/06_LightingBasic.md) 
   - [ ] [07 基础纹理](notes/07_TextureBasic.md) 
   - [ ] [08 透明效果](notes/08_Transparency.md) 
 - [ ] 中级

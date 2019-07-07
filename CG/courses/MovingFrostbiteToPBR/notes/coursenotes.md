@@ -137,6 +137,20 @@ float Fr_DisneyDiffuse ( float NdotV , float NdotL , float LdotH , float linearR
 }
 ```
 
+$$
+\begin{aligned}
+
+\frac{1}{\pi}\int_\Omega L_i \left( p , \omega _ { i } \right) n \cdot \omega _ { i } \mathrm{d} \omega _ { i }
+
+&\approx\frac{1}{\pi}\frac{1}{N}\sum_i^N\frac{L(p,\omega_i)(n\cdot\omega_i)}{\frac{n\cdot\omega_i}{\pi}}\\
+
+&= \frac{1}{N}\sum_i^N L(p,\omega_i)\\
+
+\end{aligned}
+$$
+
+
+
 ![1560927690240](assets/1560927690240.jpg)
 
 ![1560927800844](assets/1560927800844.jpg)
@@ -194,7 +208,7 @@ float D_GGX ( float NdotH , float m)
 }
 
 // This code is an example of call of previous functions
-float NdotV = abs( dot (N, V)) + 1e -5f; // avoid artifact
+float NdotV = abs(dot(N, V)) + 1e-5f; // avoid artifact
 float3 H = normalize (V + L);
 float LdotH = saturate ( dot (L, H));
 float NdotH = saturate ( dot (N, H));
@@ -854,7 +868,7 @@ $$
 retangle 立体角的计算有解析解[^UFK13]，但没有考虑 horizon handling。出于性能考虑，对 $\Omega_\text{light}$ 的估计不考虑 horizon handling，直接计算直角椎体的立体角 rihgt pyramid solid angle[^Pla]。
 
 ```c++
-1 float rightPyramidSolidAngle ( float dist , float halfWidth , float halfHeight )
+float rightPyramidSolidAngle ( float dist , float halfWidth , float halfHeight )
 {
     float a = halfWidth ;
     float b = halfHeight ;
@@ -897,7 +911,7 @@ $$
 $$
 因此，对于 illuminance 有
 $$
-E(n)=\int_{\Omega_{\text { light }}} L_{i n}\langle\mathbf{n} \cdot 1\rangle \mathrm{d} \mathbf{l}=\Omega_{\text { light }} L_{i n} \text { Average }[\langle\mathbf{n} \cdot \mathbf{1}\rangle]
+E(n)=\int_{\Omega_{\text { light }}} L_{i n}\langle\mathbf{n} \cdot 1\rangle \mathrm{d} \mathbf{l}=\Omega_{\text { light }} L_{i n} \text { Average }[\langle\mathbf{n} \cdot \mathbf{l}\rangle]
 $$
 这个均值的难以求得，可以采样估计。对于 retangular llight，我们使用 4 个角点和中心点
 $$
@@ -1207,10 +1221,10 @@ float3 getDiffuseDominantDir ( float3 N, float3 V, float NdotV , float roughness
 ```c++
 float3 evaluateIBLDiffuse (...)
 {
-    float3 dominantN = getDiffuseDominantDir (N, V, NdotV , roughness );
-    float3 diffuseLighting = diffuseLD . Sample ( sampler , dominantN );
+    float3 dominantN = getDiffuseDominantDir(N, V, NdotV , roughness );
+    float3 diffuseLighting = diffuseLD.Sample(sampler , dominantN);
 
-    float diffF = DFG . SampleLevel ( sampler , float2 (NdotV , roughness ), 0).z;
+    float diffF = DFG.SampleLevel(sampler , float2(NdotV , roughness), 0).z;
 
     return diffuseLighting * diffF ;
 }
